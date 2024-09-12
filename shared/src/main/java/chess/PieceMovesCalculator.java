@@ -7,8 +7,8 @@ import java.util.List;
 public class PieceMovesCalculator {
 
 
-    private final ChessBoard board;
-    private final ChessPosition position;
+    protected ChessBoard board;
+    protected ChessPosition position;
 
     public PieceMovesCalculator(ChessBoard board, ChessPosition position) {
 
@@ -21,13 +21,13 @@ public class PieceMovesCalculator {
         return new ArrayList<>();
     }
 
-    public class KingMoves extends PieceMovesCalculator {
+    public static class KingMoves extends PieceMovesCalculator {
         public KingMoves(ChessBoard board, ChessPosition position) {
             super(board, position);
 
         }
-
-        public Collection<ChessMove> getKingMoves() {
+        @Override
+        public Collection<ChessMove> getMoves() {
             List<ChessMove> moves = new ArrayList<>();
             int[][] movementOptions = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
             for (int[] xy : movementOptions) {

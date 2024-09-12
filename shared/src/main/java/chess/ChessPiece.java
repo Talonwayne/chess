@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.Collection;
-import java.util.Collections;
 
 /**
  * Represents a single chess piece
@@ -57,32 +56,35 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+        PieceMovesCalculator calc;
 
-        PieceMovesCalculator calc = new PieceMovesCalculator(board, myPosition);
-        switch (type) {
-            case KING:
-                calc = PieceMovesCalculator.KingMoves(board, myPosition);
-                break;
-            case QUEEN:
-                calc = new PieceMovesCalculator().QueenMoves(board, myPosition);
-                break;
-            case BISHOP:
-                calc = new PieceMovesCalculator().BishopMoves(board, myPosition);
-                break;
-            case KNIGHT:
-                calc = new PieceMovesCalculator().KnightMoves(board, myPosition);
-                break;
-            case ROOK:
-                calc = new PieceMovesCalculator().RookMoves(board, myPosition);
-                break;
-            case PAWN:
-                calc = new PieceMovesCalculator().PawnMoves(board, myPosition);
-                break;
-            default:
-                throw new Exception("bad piece type");
-        }
+                calc = new PieceMovesCalculator.KingMoves(board, myPosition);
 
-        return calc;
 
+        return calc.getMoves();
     }
 }
+                /*
+            case QUEEN:
+                calc = new PieceMovesCalculator.QueenMoves(board, myPosition);
+                break;
+            case BISHOP:
+                calc = new PieceMovesCalculator.BishopMoves(board, myPosition);
+                break;
+            case KNIGHT:
+                calc = new PieceMovesCalculator.KnightMoves(board, myPosition);
+                break;
+            case ROOK:
+                calc = new PieceMovesCalculator.RookMoves(board, myPosition);
+                break;
+            case PAWN:
+                calc = new PieceMovesCalculator.PawnMoves(board, myPosition);
+                break;
+            default:
+                throw new Error("Chess Piece Type Broke");
+        }
+
+        return calc.getMoves();
+
+    }
+}                  */
