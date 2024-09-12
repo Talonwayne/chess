@@ -23,7 +23,7 @@ public class ChessBoard {
         return Arrays.deepHashCode(squares);
     }
 
-    private ChessPiece[][] squares = new ChessPiece[9][9];
+    private ChessPiece[][] squares = new ChessPiece[10][10];
 
     public ChessBoard() {
         
