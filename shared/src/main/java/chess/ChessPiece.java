@@ -58,13 +58,10 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         PieceMovesCalculator calc;
 
+        switch (type){
+            case KING:
                 calc = new PieceMovesCalculator.KingMoves(board, myPosition);
-
-
-        return calc.getMoves();
-    }
-}
-                /*
+                break;
             case QUEEN:
                 calc = new PieceMovesCalculator.QueenMoves(board, myPosition);
                 break;
@@ -87,4 +84,4 @@ public class ChessPiece {
         return calc.getMoves();
 
     }
-}                  */
+}
