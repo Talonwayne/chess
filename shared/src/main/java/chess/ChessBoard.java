@@ -2,7 +2,7 @@ package chess;
 
 import java.util.Arrays;
 import java.util.Objects;
-
+import static java.lang.System.out;
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -27,6 +27,13 @@ public class ChessBoard {
 
     public ChessBoard() {
         
+    }
+
+    @Override
+    public String toString() {
+        return "ChessBoard{" +
+                "squares=" + Arrays.toString(squares) +
+                '}';
     }
 
     /**
@@ -92,7 +99,7 @@ public class ChessBoard {
         squares[8][6] = new ChessPiece(ChessGame.TeamColor.WHITE,ChessPiece.PieceType.BISHOP);
         squares[8][7] = new ChessPiece(ChessGame.TeamColor.WHITE,ChessPiece.PieceType.KNIGHT);
         squares[8][8] = new ChessPiece(ChessGame.TeamColor.WHITE,ChessPiece.PieceType.ROOK);
-
+        out.println(squares.toString());
 
         /*
          squares= {{'r','n','b','q','k','b','n','r'},
