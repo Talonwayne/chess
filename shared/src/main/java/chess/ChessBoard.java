@@ -142,7 +142,5 @@ public class ChessBoard {
         squares[8][6] = new ChessPiece(ChessGame.TeamColor.BLACK,ChessPiece.PieceType.BISHOP);
         squares[8][7] = new ChessPiece(ChessGame.TeamColor.BLACK,ChessPiece.PieceType.KNIGHT);
         squares[8][8] = new ChessPiece(ChessGame.TeamColor.BLACK,ChessPiece.PieceType.ROOK);
-        out.println(squares.toString());
-
     }
 }
