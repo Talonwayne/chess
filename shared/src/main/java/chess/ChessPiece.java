@@ -10,27 +10,11 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-
-    private final ChessGame.TeamColor color;
-    private final ChessPiece.PieceType type;
-
+    private ChessGame.TeamColor color;
+    private ChessPiece.PieceType type;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
-
-        this.color = pieceColor;
         this.type = type;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessPiece that = (ChessPiece) o;
-        return color == that.color && type == that.type;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(color, type);
+        this.color = pieceColor;
     }
 
     /**
@@ -49,16 +33,34 @@ public class ChessPiece {
      * @return Which team this chess piece belongs to
      */
     public ChessGame.TeamColor getTeamColor() {
-
         return color;
+    }
 
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "color=" + color +
+                ", type=" + type +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPiece piece = (ChessPiece) o;
+        return color == piece.color && type == piece.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(color, type);
     }
 
     /**
      * @return which type of chess piece this piece is
      */
     public PieceType getPieceType() {
-
         return type;
     }
 
@@ -70,32 +72,31 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        PieceMovesCalculator calc;
-
+        MovementCalc rules;
         switch (type){
             case KING:
-                calc = new PieceMovesCalculator.KingMoves(board, myPosition);
-                break;
-            case QUEEN:
-                calc = new PieceMovesCalculator.QueenMoves(board, myPosition);
-                break;
-            case BISHOP:
-                calc = new PieceMovesCalculator.BishopMoves(board, myPosition);
+                rules = new MovementCalc.KingMoves(board,myPosition);
                 break;
             case KNIGHT:
-                calc = new PieceMovesCalculator.KnightMoves(board, myPosition);
+                rules = new MovementCalc.KnightMoves(board,myPosition);
+                break;
+            case QUEEN:
+                rules = new MovementCalc.QueenMoves(board,myPosition);
+                break;
+            case BISHOP:
+                rules = new MovementCalc.BishopMoves(board,myPosition);
                 break;
             case ROOK:
-                calc = new PieceMovesCalculator.RookMoves(board, myPosition);
+                rules = new MovementCalc.RookMoves(board,myPosition);
                 break;
             case PAWN:
-                calc = new PieceMovesCalculator.PawnMoves(board, myPosition);
+                rules = new MovementCalc.PawnMoves(board,myPosition);
                 break;
             default:
-                throw new Error("Chess Piece Type Broke");
+                rules = new MovementCalc(board,myPosition);
         }
-
-        return calc.getMoves();
+        return rules.calcMoves();
 
     }
+
 }

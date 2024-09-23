@@ -42,6 +42,15 @@ public class ChessMove {
         return start;
     }
 
+    @Override
+    public String toString() {
+        return "ChessMove{" +
+                "start=" + start +
+                ", end=" + end +
+                ", type=" + type +
+                '}';
+    }
+
     /**
      * @return ChessPosition of ending location
      */
