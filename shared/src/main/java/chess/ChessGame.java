@@ -114,14 +114,15 @@ public class ChessGame implements Cloneable{
 
     public void addCastling(Collection<ChessMove> vMoves, ChessPosition startPosition, ChessPiece piece){
 
+
         ChessPiece temp = curBoard.getPiece(new ChessPosition(1,8));
-        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) whiteCastleQueenside =false;
+        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) whiteCastleKingside =false;
         temp = curBoard.getPiece(new ChessPosition(1,1));
-        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) whiteCastleKingside = false;
+        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) whiteCastleQueenside = false;
         temp = curBoard.getPiece(new ChessPosition(8,8));
-        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) blackCastleQueenside =false;
+        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) blackCastleKingside =false;
         temp = curBoard.getPiece(new ChessPosition(8,1));
-        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) blackCastleKingside = false;
+        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) blackCastleQueenside = false;
 
 
         if(whiteCastleKingside){
@@ -246,7 +247,6 @@ public class ChessGame implements Cloneable{
         Collection<ChessMove> pMoves = piece.pieceMoves(curBoard,startPosition);
         addEnPassant(vMoves,startPosition,piece);
         addCastling(vMoves,startPosition,piece);
-        //Castling
         for (ChessMove move : pMoves) {
             ChessGame copyGame = this.clone();
             copyGame.doMove(move);
