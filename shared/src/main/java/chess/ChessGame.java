@@ -231,6 +231,36 @@ public class ChessGame implements Cloneable{
 
     }
 
+    public void updateCastle(ChessMove move){
+        ChessPiece piece = curBoard.getPiece(move.getEndPosition());
+        if(piece != null) {
+            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                if (piece.getTeamColor() == TeamColor.WHITE) {
+                    whiteCastleQueenside = false;
+                    whiteCastleKingside = false;
+                } else if (piece.getTeamColor() == TeamColor.BLACK){
+                    blackCastleQueenside = false;
+                    blackCastleKingside = false;
+                }
+            } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+                if (piece.getTeamColor() == TeamColor.WHITE) {
+                    if (move.getStartPosition().getColumn() == 1) {
+                        whiteCastleQueenside = false;
+                    } else if (move.getStartPosition().getColumn() == 8){
+                        whiteCastleKingside = false;
+                    }
+                } else {
+                    if (move.getStartPosition().getColumn() == 1) {
+                        blackCastleQueenside = false;
+                    } else if (move.getStartPosition().getColumn() == 8){
+                        blackCastleKingside = false;
+                    }
+                }
+            }
+        }
+    }
+
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -256,34 +286,6 @@ public class ChessGame implements Cloneable{
             vMoves.add(move);
         }
         return vMoves;
-    }
-    public void updateCastle(ChessPosition start){
-        ChessPiece piece = curBoard.getPiece(start);
-        if(piece != null) {
-            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                if (piece.getTeamColor() == TeamColor.WHITE) {
-                    whiteCastleQueenside = false;
-                    whiteCastleKingside = false;
-                } else {
-                    blackCastleQueenside = false;
-                    blackCastleKingside = false;
-                }
-            } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-                if (piece.getTeamColor() == TeamColor.WHITE) {
-                    if (start.getColumn() == 1) {
-                        whiteCastleQueenside = false;
-                    } else {
-                        whiteCastleKingside = false;
-                    }
-                } else {
-                    if (start.getColumn() == 1) {
-                        blackCastleQueenside = false;
-                    } else {
-                        blackCastleKingside = false;
-                    }
-                }
-            }
-        }
     }
 
     public void doMove(ChessMove move) {
@@ -327,7 +329,7 @@ public class ChessGame implements Cloneable{
         for (ChessMove vMove:validMoves) {
             if (vMove.equals(move)) {
                 doMove(vMove);
-                updateCastle(move.getStartPosition());
+                updateCastle(move);
                 enpassantable = move;
                 if(curTeam == TeamColor.WHITE){
                     setTeamTurn(TeamColor.BLACK);
@@ -429,6 +431,10 @@ public class ChessGame implements Cloneable{
      */
     public void setBoard(ChessBoard board) {
         curBoard = board;
+        whiteCastleKingside = true;
+        whiteCastleQueenside = true;
+        blackCastleQueenside = true;
+        blackCastleKingside = true;
     }
 
     /**
