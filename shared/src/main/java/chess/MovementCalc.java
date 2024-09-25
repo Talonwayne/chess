@@ -7,9 +7,11 @@ import java.util.List;
 public class MovementCalc{
     protected ChessBoard board;
     protected ChessPosition position;
+    protected ChessPiece piece;
     MovementCalc(ChessBoard board,ChessPosition position){
         this.board = board;
         this.position = position;
+        this.piece = board.getPiece(position);
     }
     public Collection<ChessMove> calcMoves(){
         return new ArrayList<>();
@@ -47,8 +49,8 @@ public class MovementCalc{
     public boolean isValidPosition(ChessPosition newPosition){
         return newPosition.getColumn() >= 1 && newPosition.getColumn() <= 8 && newPosition.getRow() >= 1 && newPosition.getRow() <= 8;
     }
-    public boolean isEmpty(ChessPosition position){
-        ChessPiece nPiece = board.getPiece(position);
+    public boolean isEmpty(ChessPosition pos){
+        ChessPiece nPiece = board.getPiece(pos);
         return nPiece == null;
     }
     public boolean isEnemy(ChessPosition newPosition){
@@ -56,9 +58,9 @@ public class MovementCalc{
             return false;
         }
         ChessPiece nPiece = board.getPiece(newPosition);
-        ChessPiece Piece = board.getPiece(position);
-        return nPiece.getTeamColor() != Piece.getTeamColor();
+        return nPiece.getTeamColor() != piece.getTeamColor();
     }
+
     public static class KingMoves extends MovementCalc{
         KingMoves(ChessBoard board,ChessPosition position){
             super(board,position);
@@ -129,7 +131,7 @@ public class MovementCalc{
         PawnMoves(ChessBoard board,ChessPosition position){
             super(board,position);
         }
-        public void promotions(List<ChessMove> moves, ChessPosition newPosition, ChessPiece piece){
+        public void promotions(List<ChessMove> moves, ChessPosition newPosition){
             if ((piece.getTeamColor() == ChessGame.TeamColor.BLACK && newPosition.getRow() == 1)||(piece.getTeamColor()== ChessGame.TeamColor.WHITE && newPosition.getRow()==8)) {
                 moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
                 moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.KNIGHT));
@@ -143,7 +145,6 @@ public class MovementCalc{
         public Collection<ChessMove> calcMoves(){
             List<ChessMove> moves = new ArrayList<>();
             int orientation = 1;
-            ChessPiece piece = board.getPiece(position);
             if(piece.getTeamColor()== ChessGame.TeamColor.BLACK){
                 orientation = -1;
             }
@@ -152,7 +153,7 @@ public class MovementCalc{
             ChessPosition newPosition = new ChessPosition(nRow, position.getColumn());
             if(isValidPosition(newPosition)){
                 if(isEmpty(newPosition)){
-                    promotions(moves,newPosition, piece);
+                    promotions(moves,newPosition);
                     //double move
                     if((piece.getTeamColor() == ChessGame.TeamColor.BLACK && position.getRow() == 7)||(piece.getTeamColor()== ChessGame.TeamColor.WHITE && position.getRow()==2)) {
                         int dRow = position.getRow() + orientation * 2;
@@ -171,7 +172,7 @@ public class MovementCalc{
                 newPosition = new ChessPosition(nRow, nCol);
                 if (isValidPosition(newPosition)) {
                     if (isEnemy(newPosition)) {
-                        promotions(moves, newPosition, piece);
+                        promotions(moves, newPosition);
                     }
                 }
             }

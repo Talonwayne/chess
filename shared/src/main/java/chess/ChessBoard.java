@@ -1,15 +1,22 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Objects;
-import static java.lang.System.out;
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Cloneable{
+
+    private ChessPiece[][] squares = new ChessPiece[10][10];
+
+    public ChessBoard() {
+        
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -17,16 +24,24 @@ public class ChessBoard {
         ChessBoard that = (ChessBoard) o;
         return Objects.deepEquals(squares, that.squares);
     }
+    @Override
+    public ChessBoard clone() {
+        try {
+            ChessBoard copy = (ChessBoard) super.clone();
+            copy.squares = new ChessPiece[this.squares.length][];
+            for (int i = 0; i < this.squares.length; i++) {
+                copy.squares[i] = Arrays.copyOf(this.squares[i], this.squares[i].length);
+            }
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+
 
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(squares);
-    }
-
-    private ChessPiece[][] squares = new ChessPiece[10][10];
-
-    public ChessBoard() {
-        
     }
 
     @Override
@@ -96,14 +111,38 @@ public class ChessBoard {
      * @return Either the piece at the position, or null if no piece is at that
      * position
      */
-    public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()][position.getColumn()];
+    public ChessPiece getPiece(ChessPosition position) {return squares[position.getRow()][position.getColumn()];
     }
 
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
+    public ChessPosition findKing(ChessGame.TeamColor teamColor) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPiece piece = squares[row][col];
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    return new ChessPosition(row, col);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Collection<ChessPosition> findEnemies(ChessGame.TeamColor myTeam){
+        Collection<ChessPosition> pieces = new ArrayList<>();
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                if(squares[row][col]!= null){
+                    if(squares[row][col].getTeamColor() != myTeam){
+                        pieces.add(new ChessPosition(row,col));
+                    }
+                }
+            }
+        }
+        return pieces;
+    }
     public void resetBoard() {
 //row 1
         squares[1][1] = new ChessPiece(ChessGame.TeamColor.WHITE,ChessPiece.PieceType.ROOK);

@@ -44,10 +44,10 @@ public class ChessMove {
 
     @Override
     public String toString() {
-        return "ChessMove{" +
+        return "ChessMove{\n" +
                 "start=" + start +
-                ", end=" + end +
-                ", type=" + type +
+                ",\nend=" + end +
+                ",\ntype=" + type +
                 '}';
     }
 
