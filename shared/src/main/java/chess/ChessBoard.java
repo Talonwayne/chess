@@ -68,27 +68,13 @@ public class ChessBoard implements Cloneable{
     private char getPieceSymbol(ChessPiece piece) {
         char symbol;
         switch (piece.getPieceType()) {
-            case KING:
-                symbol = 'K';
-                break;
-            case QUEEN:
-                symbol = 'Q';
-                break;
-            case ROOK:
-                symbol = 'R';
-                break;
-            case BISHOP:
-                symbol = 'B';
-                break;
-            case KNIGHT:
-                symbol = 'N';
-                break;
-            case PAWN:
-                symbol = 'P';
-                break;
-            default:
-                symbol = '?';
-                break;
+            case KING -> symbol = 'K';
+            case QUEEN -> symbol = 'Q';
+            case ROOK -> symbol = 'R';
+            case BISHOP -> symbol = 'B';
+            case KNIGHT -> symbol = 'N';
+            case PAWN -> symbol = 'P';
+            default -> symbol = '?';
         }
         return piece.getTeamColor() == ChessGame.TeamColor.BLACK ? Character.toLowerCase(symbol) : symbol;
     }

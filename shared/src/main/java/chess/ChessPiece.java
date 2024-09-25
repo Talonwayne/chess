@@ -10,8 +10,10 @@ import java.util.Objects;
  * signature of the existing methods.
  */
 public class ChessPiece {
-    private ChessGame.TeamColor color;
-    private ChessPiece.PieceType type;
+
+    private final ChessGame.TeamColor color;
+    private final ChessPiece.PieceType type;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.type = type;
         this.color = pieceColor;
@@ -74,26 +76,13 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         MovementCalc rules;
         switch (type){
-            case KING:
-                rules = new MovementCalc.KingMoves(board,myPosition);
-                break;
-            case KNIGHT:
-                rules = new MovementCalc.KnightMoves(board,myPosition);
-                break;
-            case QUEEN:
-                rules = new MovementCalc.QueenMoves(board,myPosition);
-                break;
-            case BISHOP:
-                rules = new MovementCalc.BishopMoves(board,myPosition);
-                break;
-            case ROOK:
-                rules = new MovementCalc.RookMoves(board,myPosition);
-                break;
-            case PAWN:
-                rules = new MovementCalc.PawnMoves(board,myPosition);
-                break;
-            default:
-                rules = new MovementCalc(board,myPosition);
+            case KING -> rules = new MovementCalc.KingMoves(board,myPosition);
+            case QUEEN -> rules = new MovementCalc.QueenMoves(board,myPosition);
+            case ROOK -> rules = new MovementCalc.RookMoves(board,myPosition);
+            case BISHOP -> rules = new MovementCalc.BishopMoves(board,myPosition);
+            case KNIGHT -> rules = new MovementCalc.KnightMoves(board,myPosition);
+            case PAWN -> rules = new MovementCalc.PawnMoves(board,myPosition);
+            default -> rules = new MovementCalc(board,myPosition);
         }
         return rules.calcMoves();
 

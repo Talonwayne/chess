@@ -15,7 +15,6 @@ public class MovementCalc{
     }
     public Collection<ChessMove> calcMoves(){
         return new ArrayList<>();
-
     }
     public void findLines(List<ChessMove> moves, int changeRow, int changeCol){
         for (int i = 1; i <= 8; i++){
