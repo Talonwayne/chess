@@ -13,6 +13,21 @@ public class ChessMove {
     private final ChessPosition start;
     private final ChessPosition end;
     private final ChessPiece.PieceType type;
+    private boolean enpassant = false;
+    private boolean castle = false;
+
+    public boolean isEnpassant() {
+        return enpassant;
+    }
+
+    public void setEnpassant(boolean yes){
+        enpassant = true;
+    }
+    public void setCastle(boolean yes){
+        castle = true;
+    }
+    public boolean isCastle(){return castle;}
+
 
     @Override
     public boolean equals(Object o) {
@@ -67,4 +82,5 @@ public class ChessMove {
     public ChessPiece.PieceType getPromotionPiece() {
         return type;
     }
+
 }

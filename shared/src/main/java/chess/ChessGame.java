@@ -14,18 +14,12 @@ public class ChessGame implements Cloneable{
 
     private TeamColor curTeam;
     private ChessBoard curBoard;
-    /*
-    public boolean whiteCastleLeft = true;
-    public boolean whiteCastleRight = true;
-    public boolean blackCastleLeft = true;
-    public boolean blackCastleRight = true;
-    public ChessPosition enpassantable;
-            if(piece.getPieceType()== ChessPiece.PieceType.PAWN) {
-            this.enpassantable = move.getEndPosition();
-        }else{
-            this.enpassantable = null;
-        }
-     */
+    public boolean whiteCastleQueenside = true;
+    public boolean whiteCastleKingside = true;
+    public boolean blackCastleQueenside = true;
+    public boolean blackCastleKingside = true;
+    public ChessMove enpassantable;
+
 
     public ChessGame() {
         this.curBoard = new ChessBoard();
@@ -92,6 +86,38 @@ public class ChessGame implements Cloneable{
             return vMoves;
         }
         Collection<ChessMove> pMoves = piece.pieceMoves(curBoard,startPosition);
+        //adding enpassant here
+        if (enpassantable != null) {
+            ChessPiece oldPiece = curBoard.getPiece(enpassantable.getEndPosition());
+            if( oldPiece.getPieceType()== ChessPiece.PieceType.PAWN) {
+                int lastMoveDif = enpassantable.getStartPosition().getRow() - enpassantable.getEndPosition().getRow();
+                if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (lastMoveDif == 2 || lastMoveDif == -2) && enpassantable.getEndPosition().getRow()==startPosition.getRow()){
+                    if(enpassantable.getEndPosition().getColumn()-startPosition.getColumn() == 1){
+                        if (oldPiece.getTeamColor() == TeamColor.WHITE) {
+                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() - 1, enpassantable.getEndPosition().getColumn()-1), null);
+                            enpassant.setEnpassant(true);
+                            vMoves.add(enpassant);
+                        } else {
+                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() + 1, enpassantable.getEndPosition().getColumn()-1), null);
+                            enpassant.setEnpassant(true);
+                            vMoves.add(enpassant);
+                        }
+                    } else if (enpassantable.getEndPosition().getColumn()-startPosition.getColumn() == -1) {
+                        if (oldPiece.getTeamColor() == TeamColor.WHITE) {
+                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() - 1, enpassantable.getEndPosition().getColumn()+1), null);
+                            enpassant.setEnpassant(true);
+                            vMoves.add(enpassant);
+                        } else {
+                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() + 1, enpassantable.getEndPosition().getColumn()+1), null);
+                            enpassant.setEnpassant(true);
+                            vMoves.add(enpassant);
+                        }
+                    }
+                }
+            }
+
+        }
+
         for (ChessMove move : pMoves) {
             ChessGame copyGame = this.clone();
             copyGame.doMove(move);
@@ -104,14 +130,21 @@ public class ChessGame implements Cloneable{
     }
 
 
-    public void doMove(ChessMove move){
+    public void doMove(ChessMove move) {
         ChessPiece piece = curBoard.getPiece(move.getStartPosition());
+        if (move.isEnpassant()) {
+            int rowDif = move.getStartPosition().getRow() - move.getEndPosition().getRow();
+            ChessPosition deadPiece = new ChessPosition(move.getEndPosition().getRow() - rowDif,move.getEndPosition().getColumn());
+            curBoard.addPiece(deadPiece, null);
+        } else if (move.isCastle()) {
+            int colDif = move.getStartPosition().getColumn() - move.getEndPosition().getColumn();
+        }
         if (move.getPromotionPiece() == null) {
             curBoard.addPiece(move.getEndPosition(), piece);
         } else {
             ChessPiece promoPiece = new ChessPiece(piece.getTeamColor(), move.getPromotionPiece());
             curBoard.addPiece(move.getEndPosition(), promoPiece);
-        }
+            }
         curBoard.addPiece(move.getStartPosition(), null);
     }
     /**
@@ -124,6 +157,7 @@ public class ChessGame implements Cloneable{
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
         if (validMoves.contains(move)) {
            doMove(move);
+           enpassantable = move;
         }else{
 
             throw new InvalidMoveException();
