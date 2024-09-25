@@ -94,21 +94,21 @@ public class ChessGame implements Cloneable{
                 if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (lastMoveDif == 2 || lastMoveDif == -2) && enpassantable.getEndPosition().getRow()==startPosition.getRow()){
                     if(enpassantable.getEndPosition().getColumn()-startPosition.getColumn() == 1){
                         if (oldPiece.getTeamColor() == TeamColor.WHITE) {
-                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() - 1, enpassantable.getEndPosition().getColumn()-1), null);
+                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() - 1, enpassantable.getEndPosition().getColumn()), null);
                             enpassant.setEnpassant(true);
                             vMoves.add(enpassant);
                         } else {
-                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() + 1, enpassantable.getEndPosition().getColumn()-1), null);
+                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() + 1, enpassantable.getEndPosition().getColumn()), null);
                             enpassant.setEnpassant(true);
                             vMoves.add(enpassant);
                         }
                     } else if (enpassantable.getEndPosition().getColumn()-startPosition.getColumn() == -1) {
                         if (oldPiece.getTeamColor() == TeamColor.WHITE) {
-                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() - 1, enpassantable.getEndPosition().getColumn()+1), null);
+                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() - 1, enpassantable.getEndPosition().getColumn()), null);
                             enpassant.setEnpassant(true);
                             vMoves.add(enpassant);
                         } else {
-                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() + 1, enpassantable.getEndPosition().getColumn()+1), null);
+                            ChessMove enpassant = new ChessMove(startPosition, new ChessPosition(enpassantable.getEndPosition().getRow() + 1, enpassantable.getEndPosition().getColumn()), null);
                             enpassant.setEnpassant(true);
                             vMoves.add(enpassant);
                         }
@@ -133,9 +133,7 @@ public class ChessGame implements Cloneable{
     public void doMove(ChessMove move) {
         ChessPiece piece = curBoard.getPiece(move.getStartPosition());
         if (move.isEnpassant()) {
-            int rowDif = move.getStartPosition().getRow() - move.getEndPosition().getRow();
-            ChessPosition deadPiece = new ChessPosition(move.getEndPosition().getRow() - rowDif,move.getEndPosition().getColumn());
-            curBoard.addPiece(deadPiece, null);
+            curBoard.addPiece(enpassantable.getEndPosition(), null);
         } else if (move.isCastle()) {
             int colDif = move.getStartPosition().getColumn() - move.getEndPosition().getColumn();
         }
@@ -146,6 +144,7 @@ public class ChessGame implements Cloneable{
             curBoard.addPiece(move.getEndPosition(), promoPiece);
             }
         curBoard.addPiece(move.getStartPosition(), null);
+
     }
     /**
      * Makes a move in a chess game
@@ -155,11 +154,13 @@ public class ChessGame implements Cloneable{
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
-        if (validMoves.contains(move)) {
-           doMove(move);
-           enpassantable = move;
-        }else{
-
+        for (ChessMove vMove:validMoves) {
+            if (vMove.equals(move)) {
+                doMove(vMove);
+                enpassantable = move;
+            }
+        }
+        if (!validMoves.contains(move)){
             throw new InvalidMoveException();
         }
     }

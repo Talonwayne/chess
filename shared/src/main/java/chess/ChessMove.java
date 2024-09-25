@@ -21,10 +21,10 @@ public class ChessMove {
     }
 
     public void setEnpassant(boolean yes){
-        enpassant = true;
+        enpassant = yes;
     }
     public void setCastle(boolean yes){
-        castle = true;
+        castle = yes;
     }
     public boolean isCastle(){return castle;}
 
