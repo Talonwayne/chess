@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,6 +24,8 @@ public class ChessGame implements Cloneable{
 
     public ChessGame() {
         this.curBoard = new ChessBoard();
+        curBoard.resetBoard();
+        curTeam = TeamColor.WHITE;
     }
 
     /**
@@ -196,9 +199,27 @@ public class ChessGame implements Cloneable{
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        //Make all the copies of the board for all the possible teamColor moves
-        //ask if they are in check, if one board is not, return false
-        throw new RuntimeException("Not implemented");
+        if(!isInCheck(teamColor)){
+            return false;
+        }
+        Collection<ChessPosition> myPositions;
+        if (teamColor == TeamColor.BLACK){
+            myPositions = curBoard.findEnemies(TeamColor.WHITE);
+        } else {
+            myPositions = curBoard.findEnemies(TeamColor.BLACK);
+        }
+        for (ChessPosition pos:myPositions) {
+            ChessPiece myPiece = curBoard.getPiece(pos);
+            Collection<ChessMove> myMoves = myPiece.pieceMoves(curBoard,pos);
+            for (ChessMove move : myMoves) {
+                ChessGame copyGame = this.clone();
+                copyGame.doMove(move);
+                if (!copyGame.isInCheck(myPiece.getTeamColor())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -209,7 +230,23 @@ public class ChessGame implements Cloneable{
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) {
+            return false;
+        }
+        List<ChessMove> count = new ArrayList<>();
+        Collection<ChessPosition> myPositions;
+        if (teamColor == TeamColor.BLACK){
+            myPositions = curBoard.findEnemies(TeamColor.WHITE);
+        } else {
+            myPositions = curBoard.findEnemies(TeamColor.BLACK);
+        }
+        if (myPositions.isEmpty()){
+            return false;
+        }
+        for (ChessPosition pos:myPositions) {
+                count.addAll(validMoves(pos));
+        }
+        return count.isEmpty();
     }
 
     /**
