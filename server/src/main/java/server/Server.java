@@ -15,6 +15,7 @@ public class Server {
         Spark.init();
 
         Spark.awaitInitialization();
+        System.out.println("Listening on port " + desiredPort);
         return Spark.port();
     }
 

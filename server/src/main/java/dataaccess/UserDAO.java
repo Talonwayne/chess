@@ -16,7 +16,9 @@ public class UserDAO {
     }
 
     public void createUser(String username, String password, String email) throws DataAccessException{
-        if (username.isBlank()|| password.isBlank()||email.isBlank()){throw new DataAccessException("Missing New User Parameter");}
+        if (username.isBlank()|| password.isBlank()||email.isBlank()){
+            throw new DataAccessException("Missing New User Parameter");
+        }
         users.add(new UserData(username,password,email));
     }
 
