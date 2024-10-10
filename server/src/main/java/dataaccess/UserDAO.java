@@ -2,23 +2,28 @@ package dataaccess;
 
 import model.UserData;
 
-import java.util.List;
+import java.util.Set;
 
 public class UserDAO {
-    private List<UserData> users;
+    private Set<UserData> users;
 
-    public UserDAO(List<UserData> users){
-        this.users = users;
+    public UserDAO(){
     }
 
-    public void clear(){
+    public void clear() {
         users.clear();
     }
 
     public void createUser(String username, String password, String email) throws DataAccessException{
         if (username.isBlank()|| password.isBlank()||email.isBlank()){
-            throw new DataAccessException("Missing New User Parameter");
+            throw new DataAccessException("Missing Parameter");
         }
+        for (UserData user:users){
+            if (user.username().equals(username)){
+                throw new DataAccessException("Username already taken");
+            }
+        }
+
         users.add(new UserData(username,password,email));
     }
 

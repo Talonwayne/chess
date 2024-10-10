@@ -5,18 +5,17 @@ import model.GameData;
 
 import java.util.List;
 
-public class GameDAO {
+public  class GameDAO {
     private List<GameData> games;
 
-    public GameDAO(List<GameData> games){
-        this.games = games;
+    public GameDAO(){
     }
 
-    public void clear(){
+    public  void clear(){
         games.clear();
     }
 
-    public GameData getGame(int gameID) throws DataAccessException{
+    public  GameData getGame(int gameID) throws DataAccessException{
         for (GameData game:games){
             if(game.gameID() == gameID){
                 return game;
@@ -25,15 +24,15 @@ public class GameDAO {
         throw new DataAccessException("Game ID does not Exist");
     }
 
-    public void createGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game){
+    public  void createGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game){
         games.add(new GameData(gameID,whiteUsername,blackUsername,gameName,game));
     }
 
-    public List<GameData> listGames(){
+    public  List<GameData> listGames(){
         return games;
     }
 
-    public void updateGame(){
+    public  void updateGame(){
 
     }
 }
