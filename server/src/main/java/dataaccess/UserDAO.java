@@ -13,13 +13,13 @@ public class UserDAO {
         users.clear();
     }
 
-    public void createUser(String username, String password, String email) throws DataAccessException{
+    public void createUser(String username, String password, String email) throws DataAccessException, UnauthorisedException{
         if (username.isBlank()|| password.isBlank()||email.isBlank()){
             throw new DataAccessException("Missing Parameter");
         }
         for (UserData user:users){
             if (user.username().equals(username)){
-                throw new DataAccessException("Username already taken");
+                throw new UnauthorisedException("Username already taken");
             }
         }
         users.add(new UserData(username,password,email));

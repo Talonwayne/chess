@@ -1,11 +1,11 @@
 package handlers;
 
-public class Request {
+public class Requests {
 
-    public static class ClearRequest extends Request {
+    public static class ClearRequest extends Requests {
     }
 
-    public static class LoginRequest extends Request {
+    public static class LoginRequest extends Requests {
         public String username;
         public String password;
 
@@ -24,7 +24,7 @@ public class Request {
         }
     }
 
-    public static class AuthenticatedRequest extends Request {
+    public static class AuthenticatedRequest extends Requests {
         public String authToken;
 
         public AuthenticatedRequest(String authToken) {

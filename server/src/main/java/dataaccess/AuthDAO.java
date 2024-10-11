@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,19 +14,20 @@ public  class AuthDAO {
         auths.clear();
     }
 
-    public String createAuth(UserData user){
+    public AuthData createAuth(String username){
         String authtoken = UUID.randomUUID().toString();
-        auths.add(new AuthData(authtoken, user.username()));
-        return authtoken;
+        AuthData newauth = new AuthData(authtoken, username);
+        auths.add(newauth); 
+        return newauth;
     }
 
-    public  AuthData getAuth(String authToken) throws DataAccessException{
+    public  boolean validateAuth(String authToken) throws UnauthorisedException{
         for (AuthData auth:auths){
             if (auth.authToken().equals(authToken)){
-                return auth;
+                return true;
             }
         }
-        throw new DataAccessException("authToken Does not Exist");
+        throw new UnauthorisedException("authToken Does not Exist");
     }
 
     public  void deleteAuth(String authToken)throws DataAccessException{
