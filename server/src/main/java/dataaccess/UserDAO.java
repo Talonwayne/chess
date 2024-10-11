@@ -30,9 +30,9 @@ public class UserDAO {
         users.add(new UserData(username,password,email));
     }
 
-    public UserData getUser(String username) throws DataAccessException, UnauthorisedException{
+    public UserData getUser(String username) throws UnauthorisedException{
         if(users == null || users.isEmpty()){
-            throw new DataAccessException("List Users is Empty");
+            throw new UnauthorisedException("List Users is Empty");
         }
         for (UserData user : users){
             if (user.username().equals(username)){
@@ -41,5 +41,4 @@ public class UserDAO {
         }
         throw new UnauthorisedException("User not Found");
     }
-
 }
