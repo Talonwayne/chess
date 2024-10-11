@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.UserData;
-
 import java.util.Set;
 
 public class UserDAO {
@@ -23,7 +22,6 @@ public class UserDAO {
                 throw new DataAccessException("Username already taken");
             }
         }
-
         users.add(new UserData(username,password,email));
     }
 
