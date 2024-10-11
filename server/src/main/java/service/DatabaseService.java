@@ -20,4 +20,16 @@ public class DatabaseService {
         gameDAO.clear();
         authDAO.clear();
     }
+
+    public UserDAO getUserDAO() {
+        return userDAO;
+    }
+
+    public GameDAO getGameDAO() {
+        return gameDAO;
+    }
+
+    public AuthDAO getAuthDAO() {
+        return authDAO;
+    }
 }
