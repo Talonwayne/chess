@@ -30,14 +30,14 @@ public class GameService {
         String gameName = desiredGame.gameName();
         ChessGame game = desiredGame.game();
         if (color.equals("WHITE")) {
-            if (whitePlayer.equals("")) {
+            if (whitePlayer.equals("null")) {
                 updatedGame = new GameData(gameID, authDAO.getUsername(authToken), blackPlayer, gameName, game);
                 gameDAO.updateGame(gameID, updatedGame);
             } else {
                 throw new FileAlreadyExistsException("The White Pieces Are Taken");
             }
         } else if (color.equals("BLACK")) {
-            if (blackPlayer.equals("")) {
+            if (blackPlayer.equals("null")) {
                 updatedGame = new GameData(gameID, whitePlayer, authDAO.getUsername(authToken), gameName, game);
                 gameDAO.updateGame(gameID, updatedGame);
             } else {

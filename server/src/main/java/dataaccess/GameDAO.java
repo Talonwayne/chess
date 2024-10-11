@@ -4,9 +4,7 @@ import chess.ChessGame;
 import model.GameData;
 
 import java.nio.file.FileAlreadyExistsException;
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
+import java.util.*;
 
 public  class GameDAO {
     private List<GameData> games;
@@ -33,7 +31,7 @@ public  class GameDAO {
         throw new InputMismatchException("Game ID does not Exist");
     }
 
-    public  int createGame(String gameName) throws FileAlreadyExistsException, DataAccessException {
+    public  int createGame(String gameName) throws FileAlreadyExistsException {
         for (GameData game:games){
             if(game.gameName().equals(gameName)){
                 throw new FileAlreadyExistsException("GameName already exists");
@@ -41,7 +39,7 @@ public  class GameDAO {
         }
         int gameID = number;
         number++;
-        games.add(new GameData(gameID,"","",gameName,new ChessGame()));
+        games.add(new GameData(gameID,"null","null",gameName,new ChessGame()));
         return gameID;
     }
 
