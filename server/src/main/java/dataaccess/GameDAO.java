@@ -7,8 +7,10 @@ import java.util.List;
 
 public  class GameDAO {
     private List<GameData> games;
+    private int number;
 
     public GameDAO(){
+        number = 1;
     }
 
     public  void clear(){
@@ -24,15 +26,20 @@ public  class GameDAO {
         throw new DataAccessException("Game ID does not Exist");
     }
 
-    public  void createGame(int gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game){
-        games.add(new GameData(gameID,whiteUsername,blackUsername,gameName,game));
+    public  int createGame(String gameName){
+        int gameID = number;
+        number++;
+        games.add(new GameData(gameID,"","",gameName,new ChessGame()));
+        return gameID;
     }
 
     public  List<GameData> listGames(){
         return games;
     }
 
-    public  void updateGame(){
-
+    public  void updateGame(int gameID, GameData updatedGame) throws DataAccessException{
+        GameData oldGame = getGame(gameID);
+        games.remove(oldGame);
+        games.add(updatedGame);
     }
 }

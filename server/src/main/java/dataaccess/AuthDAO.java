@@ -34,8 +34,18 @@ public  class AuthDAO {
         for (AuthData auth:auths){
             if (auth.authToken().equals(authToken)){
                 auths.remove(auth);
+                return;
             }
         }
         throw new DataAccessException("authToken Does not Exist");
+    }
+
+    public String getUsername(String authToken) throws UnauthorisedException{
+        for (AuthData auth:auths){
+            if(auth.authToken().equals(authToken)){
+                return auth.username();
+            }
+        }
+        throw new UnauthorisedException("Authtoken Does not Exist");
     }
 }
