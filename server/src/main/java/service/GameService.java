@@ -20,8 +20,8 @@ public class GameService {
     }
 
     public void joinGame(String authToken, String color, int gameID) throws FileAlreadyExistsException,InputMismatchException, DataAccessException, UnauthorisedException {
-        if (color != "BLACK" && color != "WHITE") {
-            throw new InputMismatchException("Color is not Black or White");
+        if (color == null || color.isEmpty()) {
+            throw new InputMismatchException("Color is empty");
         }
         GameData desiredGame = gameDAO.getGame(gameID);
         GameData updatedGame;
@@ -29,14 +29,14 @@ public class GameService {
         String blackPlayer = desiredGame.blackUsername();
         String gameName = desiredGame.gameName();
         ChessGame game = desiredGame.game();
-        if (color == "WHITE") {
+        if (color.equals("WHITE")) {
             if (whitePlayer.equals("")) {
                 updatedGame = new GameData(gameID, authDAO.getUsername(authToken), blackPlayer, gameName, game);
                 gameDAO.updateGame(gameID, updatedGame);
             } else {
                 throw new FileAlreadyExistsException("The White Pieces Are Taken");
             }
-        } else if (color == "BLACK") {
+        } else if (color.equals("BLACK")) {
             if (blackPlayer.equals("")) {
                 updatedGame = new GameData(gameID, whitePlayer, authDAO.getUsername(authToken), gameName, game);
                 gameDAO.updateGame(gameID, updatedGame);

@@ -5,6 +5,7 @@ import model.GameData;
 
 import java.nio.file.FileAlreadyExistsException;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 
 public  class GameDAO {
@@ -20,7 +21,7 @@ public  class GameDAO {
         games.clear();
     }
 
-    public  GameData getGame(int gameID) throws DataAccessException{
+    public  GameData getGame(int gameID) throws InputMismatchException, DataAccessException {
         if (games == null || games.isEmpty()){
             throw new DataAccessException("List games is empty");
         }
@@ -29,7 +30,7 @@ public  class GameDAO {
                 return game;
             }
         }
-        throw new DataAccessException("Game ID does not Exist");
+        throw new InputMismatchException("Game ID does not Exist");
     }
 
     public  int createGame(String gameName) throws FileAlreadyExistsException, DataAccessException {

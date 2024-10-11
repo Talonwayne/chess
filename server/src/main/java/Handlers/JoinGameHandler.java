@@ -1,5 +1,6 @@
 package handlers;
 
+import dataaccess.UnauthorisedException;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -23,16 +24,16 @@ public class JoinGameHandler implements Route {
     @Override
     public Object handle(Request req, Response res) throws Exception {
         String requestBody = req.body();
-        String authToken = req.headers().toString();
-        if (!Validator.isValidAuth(authToken,userService.getAuthDAO())){
-            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
-        }
+        String authToken = req.headers("authorization");
         JoinGameRequest joinGameRequest = JsonSerializer.fromJson(requestBody, JoinGameRequest.class);
 
         try {
+            Validator.isValidAuth(authToken,userService.getAuthDAO());
             gameService.joinGame(authToken,joinGameRequest.playerColor, joinGameRequest.gameID);
-            return JsonSerializer.makeSparkResponse(200, res, "{}");
-        } catch (FileAlreadyExistsException e) {
+            return "{}";
+        }catch (UnauthorisedException e){
+            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
+        }catch (FileAlreadyExistsException e) {
             return JsonSerializer.makeSparkResponse(403, res, new ErrorResponse("Error: already taken"));
         }catch (InputMismatchException e){
             return JsonSerializer.makeSparkResponse(400, res, new ErrorResponse("Error: bad request"));

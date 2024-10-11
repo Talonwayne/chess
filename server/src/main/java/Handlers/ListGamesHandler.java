@@ -21,7 +21,7 @@ public class ListGamesHandler implements Route {
 
     @Override
     public Object handle(Request req, Response res) throws Exception {
-        String authToken = req.headers().toString();
+        String authToken = req.headers("authorization");
         if (!Validator.isValidAuth(authToken,userService.getAuthDAO())){
             return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
         }

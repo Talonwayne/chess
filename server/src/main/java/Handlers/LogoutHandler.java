@@ -16,22 +16,16 @@ public class LogoutHandler implements Route {
 
     @Override
     public Object handle(Request req, Response res) throws Exception {
-        String requestBody = req.body();
-        LogoutRequest logoutRequest = JsonSerializer.fromJson(requestBody, LogoutRequest.class);
-        String authToken = logoutRequest.authorization;
+        String authToken = req.headers("authorization");
         
         try {
             Validator.isValidAuth(authToken, userService.getAuthDAO());
             userService.logout(authToken);
-            return JsonSerializer.makeSparkResponse(200, res,"{}");
+            return "{}";
         } catch (UnauthorisedException e) {
             return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
         } catch (DataAccessException e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }
     }
-}
-
-class LogoutRequest {
-    public String authorization;
 }
