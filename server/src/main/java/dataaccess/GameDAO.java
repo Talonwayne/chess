@@ -3,6 +3,7 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.util.List;
 
 public  class GameDAO {
@@ -26,7 +27,12 @@ public  class GameDAO {
         throw new DataAccessException("Game ID does not Exist");
     }
 
-    public  int createGame(String gameName){
+    public  int createGame(String gameName) throws FileAlreadyExistsException {
+        for (GameData game:games){
+            if(game.gameName().equals(gameName)){
+                throw new FileAlreadyExistsException("GameName already exists");
+            }
+        }
         int gameID = number;
         number++;
         games.add(new GameData(gameID,"","",gameName,new ChessGame()));

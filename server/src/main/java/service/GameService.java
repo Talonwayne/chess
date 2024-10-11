@@ -50,7 +50,7 @@ public class GameService {
         gameDAO.updateGame(gameID,desiredGame);
     }
 
-    public int createGame(String gameName){
+    public int createGame(String gameName)throws FileAlreadyExistsException{
         return gameDAO.createGame(gameName);
     }
 
