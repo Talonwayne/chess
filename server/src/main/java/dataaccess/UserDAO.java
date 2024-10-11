@@ -1,12 +1,15 @@
 package dataaccess;
 
 import model.UserData;
-import java.util.Set;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDAO {
-    private Set<UserData> users;
+    private List<UserData> users;
 
     public UserDAO(){
+        this.users = new ArrayList<>();
     }
 
     public void clear() {
@@ -17,21 +20,26 @@ public class UserDAO {
         if (username.isBlank()|| password.isBlank()||email.isBlank()){
             throw new DataAccessException("Missing Parameter");
         }
-        for (UserData user:users){
-            if (user.username().equals(username)){
-                throw new UnauthorisedException("Username already taken");
+
+            for (UserData user : users) {
+                if (user.username().equals(username)) {
+                    throw new UnauthorisedException("Username already taken");
+                }
             }
-        }
+
         users.add(new UserData(username,password,email));
     }
 
-    public UserData getUser(String username) throws DataAccessException{
+    public UserData getUser(String username) throws DataAccessException, UnauthorisedException{
+        if(users == null || users.isEmpty()){
+            throw new DataAccessException("List Users is Empty");
+        }
         for (UserData user : users){
             if (user.username().equals(username)){
                 return user;
             }
         }
-        throw new DataAccessException("User not Found");
+        throw new UnauthorisedException("User not Found");
     }
 
 }

@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.GameData;
 
 import java.nio.file.FileAlreadyExistsException;
+import java.util.ArrayList;
 import java.util.List;
 
 public  class GameDAO {
@@ -11,7 +12,8 @@ public  class GameDAO {
     private int number;
 
     public GameDAO(){
-        number = 1;
+        this.number = 1;
+        this.games = new ArrayList<>();
     }
 
     public  void clear(){
@@ -19,6 +21,9 @@ public  class GameDAO {
     }
 
     public  GameData getGame(int gameID) throws DataAccessException{
+        if (games == null || games.isEmpty()){
+            throw new DataAccessException("List games is empty");
+        }
         for (GameData game:games){
             if(game.gameID() == gameID){
                 return game;
@@ -27,7 +32,7 @@ public  class GameDAO {
         throw new DataAccessException("Game ID does not Exist");
     }
 
-    public  int createGame(String gameName) throws FileAlreadyExistsException {
+    public  int createGame(String gameName) throws FileAlreadyExistsException, DataAccessException {
         for (GameData game:games){
             if(game.gameName().equals(gameName)){
                 throw new FileAlreadyExistsException("GameName already exists");
