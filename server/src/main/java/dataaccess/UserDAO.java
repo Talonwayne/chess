@@ -3,13 +3,14 @@ package dataaccess;
 import model.UserData;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class UserDAO {
-    private List<UserData> users;
+    private HashSet<UserData> users;
 
     public UserDAO(){
-        this.users = new ArrayList<>();
+        this.users = new HashSet<>();
     }
 
     public void clear() {

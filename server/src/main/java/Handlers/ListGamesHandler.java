@@ -1,11 +1,14 @@
 package handlers;
 
+import dataaccess.UnauthorisedException;
 import model.GameData;
 import service.GameService;
 import spark.Request;
 import spark.Response;
 import service.UserService;
 import spark.Route;
+
+import java.util.HashSet;
 import java.util.List;
 
 public class ListGamesHandler implements Route {
@@ -22,13 +25,11 @@ public class ListGamesHandler implements Route {
     @Override
     public Object handle(Request req, Response res) throws Exception {
         String authToken = req.headers("authorization");
-        if (!Validator.isValidAuth(authToken,userService.getAuthDAO())){
-            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
-        }
-
         try {
-            List<GameData> games = gameService.listGames();
-            return JsonSerializer.makeSparkResponse(200, res, new ListGamesResponse(games));
+            Validator.isValidAuth(authToken,userService.getAuthDAO());
+            return JsonSerializer.makeSparkResponse(200, res, new ListGamesResponse(gameService.listGames()));
+        } catch (UnauthorisedException e){
+            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
         } catch (Exception e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }
@@ -36,8 +37,8 @@ public class ListGamesHandler implements Route {
 }
 
 class ListGamesResponse{
-    public List<GameData> games;
-    ListGamesResponse(List<GameData> games) {
+    public HashSet<GameData> games;
+    ListGamesResponse(HashSet<GameData> games) {
         this.games = games;
     }
 }

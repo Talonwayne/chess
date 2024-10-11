@@ -7,12 +7,12 @@ import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
 public  class GameDAO {
-    private List<GameData> games;
+    private HashSet<GameData> games;
     private int number;
 
     public GameDAO(){
         this.number = 1;
-        this.games = new ArrayList<>();
+        this.games = new HashSet<>();
     }
 
     public  void clear(){
@@ -43,7 +43,7 @@ public  class GameDAO {
         return gameID;
     }
 
-    public  List<GameData> listGames(){
+    public  HashSet<GameData> listGames(){
         return games;
     }
 

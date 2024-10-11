@@ -5,6 +5,7 @@ import dataaccess.*;
 import model.GameData;
 
 import java.nio.file.FileAlreadyExistsException;
+import java.util.HashSet;
 import java.util.InputMismatchException;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class GameService {
         return gameDAO.createGame(gameName);
     }
 
-    public List<GameData> listGames(){
+    public HashSet<GameData> listGames(){
         return gameDAO.listGames();
     }
 
