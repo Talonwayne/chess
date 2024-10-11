@@ -39,7 +39,7 @@ public  class GameDAO {
         }
         int gameID = number;
         number++;
-        games.add(new GameData(gameID,"null","null",gameName,new ChessGame()));
+        games.add(new GameData(gameID,null,null,gameName,new ChessGame()));
         return gameID;
     }
 
