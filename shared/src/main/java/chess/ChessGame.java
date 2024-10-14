@@ -45,8 +45,8 @@ public class ChessGame implements Cloneable{
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessGame chessGame = (ChessGame) o;
         return curTeam == chessGame.curTeam && Objects.equals(curBoard, chessGame.curBoard);
     }
@@ -79,8 +79,13 @@ public class ChessGame implements Cloneable{
             int lastMoveDif = enpassantable.getStartPosition().getRow() - enpassantable.getEndPosition().getRow();
             int colChange = enpassantable.getEndPosition().getColumn() - startPosition.getColumn();
             if(oldPiece != null && oldPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (lastMoveDif == 2 || lastMoveDif == -2) && enpassantable.getEndPosition().getRow()==startPosition.getRow() && (colChange == 1 || colChange == -1)){
-                    ChessPosition newPosition = new ChessPosition(enpassantable.getEndPosition().getRow() + (lastMoveDif/2), enpassantable.getEndPosition().getColumn());
+                if (piece.getPieceType() == ChessPiece.PieceType.PAWN &&
+                        (lastMoveDif == 2 || lastMoveDif == -2) &&
+                        enpassantable.getEndPosition().getRow()==startPosition.getRow() &&
+                        (colChange == 1 || colChange == -1)){
+                    ChessPosition newPosition =
+                            new ChessPosition(enpassantable.getEndPosition().getRow() +
+                                    (lastMoveDif/2), enpassantable.getEndPosition().getColumn());
                     ChessMove enpassant = new ChessMove(startPosition, newPosition, null);
                     enpassant.setEnpassant(true);
                     vMoves.add(enpassant);
@@ -297,8 +302,9 @@ public class ChessGame implements Cloneable{
             Collection<ChessMove> attacks = enemyPiece.pieceMoves(curBoard,enemyPos);
             for (ChessMove move : attacks) {
                 ChessPosition attack = move.getEndPosition();
-                if(attack.equals(kingPosition))
+                if(attack.equals(kingPosition)) {
                     return true;
+                }
             }
         }
         return false;

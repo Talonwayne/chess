@@ -131,7 +131,9 @@ public class MovementCalc{
             super(board,position);
         }
         public void promotions(List<ChessMove> moves, ChessPosition newPosition){
-            if ((piece.getTeamColor() == ChessGame.TeamColor.BLACK && newPosition.getRow() == 1)||(piece.getTeamColor()== ChessGame.TeamColor.WHITE && newPosition.getRow()==8)) {
+            boolean blackPromote = (piece.getTeamColor() == ChessGame.TeamColor.BLACK && newPosition.getRow() == 1);
+            boolean whitePromote = (piece.getTeamColor()== ChessGame.TeamColor.WHITE && newPosition.getRow()==8);
+            if (blackPromote || whitePromote) {
                 moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.QUEEN));
                 moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.KNIGHT));
                 moves.add(new ChessMove(position, newPosition, ChessPiece.PieceType.ROOK));
@@ -150,18 +152,16 @@ public class MovementCalc{
             //single move
             int nRow = position.getRow()+orientation;
             ChessPosition newPosition = new ChessPosition(nRow, position.getColumn());
-            if(isValidPosition(newPosition)){
-                if(isEmpty(newPosition)){
-                    promotions(moves,newPosition);
-                    //double move
-                    if((piece.getTeamColor() == ChessGame.TeamColor.BLACK && position.getRow() == 7)||(piece.getTeamColor()== ChessGame.TeamColor.WHITE && position.getRow()==2)) {
-                        int dRow = position.getRow() + orientation * 2;
-                        newPosition = new ChessPosition(dRow, position.getColumn());
-                        if (isValidPosition(newPosition)){
-                            if(isEmpty(newPosition)){
-                                moves.add(new ChessMove(position, newPosition, null));
-                            }
-                        }
+            if(isValidPosition(newPosition) && isEmpty(newPosition)){
+                promotions(moves,newPosition);
+                //double move
+                boolean blackFirstMove = (piece.getTeamColor() == ChessGame.TeamColor.BLACK && position.getRow() == 7);
+                boolean whiteFirstMove = (piece.getTeamColor()== ChessGame.TeamColor.WHITE && position.getRow()==2);
+                if(blackFirstMove || whiteFirstMove) {
+                    int dRow = position.getRow() + orientation * 2;
+                    newPosition = new ChessPosition(dRow, position.getColumn());
+                    if (isValidPosition(newPosition) && isEmpty(newPosition)){
+                        moves.add(new ChessMove(position, newPosition, null));
                     }
                 }
             }

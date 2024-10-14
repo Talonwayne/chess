@@ -7,7 +7,6 @@ import model.GameData;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.HashSet;
 import java.util.InputMismatchException;
-import java.util.List;
 
 public class GameService {
     public UserDAO userDAO;
@@ -20,7 +19,8 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public void joinGame(String authToken, String color, int gameID) throws FileAlreadyExistsException,InputMismatchException, DataAccessException, UnauthorisedException {
+    public void joinGame(String authToken, String color, int gameID)
+            throws FileAlreadyExistsException,InputMismatchException, DataAccessException, UnauthorisedException {
         if (color == null || color.isEmpty()) {
             throw new InputMismatchException("Color is empty");
         }
@@ -48,7 +48,7 @@ public class GameService {
         }
     }
 
-    public int createGame(String gameName)throws FileAlreadyExistsException, DataAccessException{
+    public int createGame(String gameName)throws FileAlreadyExistsException{
         return gameDAO.createGame(gameName);
     }
 
