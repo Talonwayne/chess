@@ -89,122 +89,92 @@ public class ChessGame implements Cloneable{
             }
         }
     }
+    public void updateCorners(ChessPiece piece){
+        ChessPiece temp = curBoard.getPiece(new ChessPosition(1,8));
+        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) {
+            whiteCastleKingside =false;
+        }
+        temp = curBoard.getPiece(new ChessPosition(1,1));
+        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) {
+            whiteCastleQueenside = false;
+        }
+        temp = curBoard.getPiece(new ChessPosition(8,8));
+        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) {
+            blackCastleKingside = false;
+        }
+        temp = curBoard.getPiece(new ChessPosition(8,1));
+        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) {
+            blackCastleQueenside = false;
+        }
+
+    }
+
+    public void queensideCastle(Collection<ChessMove> vMoves, ChessPosition startPosition, ChessPiece piece, int row){
+        ChessPosition n1 = new ChessPosition(row, 2);
+        ChessPosition n2 = new ChessPosition(row, 3);
+        ChessPosition n3 = new ChessPosition(row, 4);
+        ChessPiece np1 = curBoard.getPiece(n1);
+        ChessPiece np2 = curBoard.getPiece(n2);
+        ChessPiece np3 = curBoard.getPiece(n3);
+        if (np1 == null && np2 == null && np3 == null) {
+            ChessGame copyGame = this.clone();
+            ChessMove castle = new ChessMove(startPosition, new ChessPosition(row, 2), null);
+            copyGame.doMove(castle);
+            if (!copyGame.isInCheck(piece.getTeamColor())) {
+                copyGame = this.clone();
+                castle = new ChessMove(startPosition, new ChessPosition(row, 4), null);
+                copyGame.doMove(castle);
+                if (!copyGame.isInCheck(piece.getTeamColor())) {
+                    copyGame = this.clone();
+                    castle = new ChessMove(startPosition, new ChessPosition(row, 3), null);
+                    copyGame.doMove(castle);
+                    if (!copyGame.isInCheck(piece.getTeamColor())) {
+                        castle.setCastle(true);
+                        vMoves.add(castle);
+                    }
+                }
+            }
+        }
+    }
+
+    public void kingsideCastle(Collection<ChessMove> vMoves, ChessPosition startPosition, ChessPiece piece, int row){
+        ChessPosition n1 = new ChessPosition(row,7);
+        ChessPosition n2 = new ChessPosition(row,6);
+        ChessPiece np1 = curBoard.getPiece(n1);
+        ChessPiece np2 = curBoard.getPiece(n2);
+        if(np1 == null && np2 == null){
+            ChessGame copyGame = this.clone();
+            ChessMove castle = new ChessMove(startPosition, new ChessPosition(row,6), null);
+            copyGame.doMove(castle);
+            if (!copyGame.isInCheck(piece.getTeamColor())) {
+                copyGame = this.clone();
+                castle = new ChessMove(startPosition, new ChessPosition(row,7), null);
+                copyGame.doMove(castle);
+                if (!copyGame.isInCheck(piece.getTeamColor())) {
+                    castle.setCastle(true);
+                    vMoves.add(castle);
+                }
+            }
+        }
+    }
 
     public void addCastling(Collection<ChessMove> vMoves, ChessPosition startPosition, ChessPiece piece){
-
-        ChessPiece temp = curBoard.getPiece(new ChessPosition(1,8));
-        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) whiteCastleKingside =false;
-        temp = curBoard.getPiece(new ChessPosition(1,1));
-        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) whiteCastleQueenside = false;
-        temp = curBoard.getPiece(new ChessPosition(8,8));
-        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) blackCastleKingside =false;
-        temp = curBoard.getPiece(new ChessPosition(8,1));
-        if (temp == null || (temp.getPieceType() != ChessPiece.PieceType.ROOK) && temp.getTeamColor() == piece.getTeamColor()) blackCastleQueenside = false;
-
+        updateCorners(piece);
+        if (piece.getPieceType() != ChessPiece.PieceType.KING){
+            return;
+        }
         if(whiteCastleKingside){
-            if(piece.getPieceType()== ChessPiece.PieceType.KING){
-                ChessPosition n1 = new ChessPosition(1,7);
-                ChessPosition n2 = new ChessPosition(1,6);
-                ChessPiece np1 = curBoard.getPiece(n1);
-                ChessPiece np2 = curBoard.getPiece(n2);
-                if(np1 == null && np2 == null){
-                    ChessGame copyGame = this.clone();
-                    ChessMove castle = new ChessMove(startPosition, new ChessPosition(1,6), null);
-                    copyGame.doMove(castle);
-                    if (!copyGame.isInCheck(piece.getTeamColor())) {
-                        copyGame = this.clone();
-                        castle = new ChessMove(startPosition, new ChessPosition(1,7), null);
-                        copyGame.doMove(castle);
-                        if (!copyGame.isInCheck(piece.getTeamColor())) {
-                            castle.setCastle(true);
-                            vMoves.add(castle);
-                        }
-                    }
-                }
-            }
+            kingsideCastle(vMoves,startPosition,piece,1);
         }
         if(blackCastleKingside){
-            if(piece.getPieceType()== ChessPiece.PieceType.KING){
-                ChessPosition n1 = new ChessPosition(8,7);
-                ChessPosition n2 = new ChessPosition(8,6);
-                ChessPiece np1 = curBoard.getPiece(n1);
-                ChessPiece np2 = curBoard.getPiece(n2);
-                if(np1 == null && np2 == null){
-                    ChessGame copyGame = this.clone();
-                    ChessMove castle = new ChessMove(startPosition, new ChessPosition(8,6), null);
-                    copyGame.doMove(castle);
-                    if (!copyGame.isInCheck(piece.getTeamColor())) {
-                        copyGame = this.clone();
-                        castle = new ChessMove(startPosition, new ChessPosition(8,7), null);
-                        copyGame.doMove(castle);
-                        if (!copyGame.isInCheck(piece.getTeamColor())) {
-                            castle.setCastle(true);
-                            vMoves.add(castle);
-                        }
-                    }
-                }
-            }
+            kingsideCastle(vMoves,startPosition,piece,8);
         }
         if(whiteCastleQueenside) {
-            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                ChessPosition n1 = new ChessPosition(1, 2);
-                ChessPosition n2 = new ChessPosition(1, 3);
-                ChessPosition n3 = new ChessPosition(1, 4);
-                ChessPiece np1 = curBoard.getPiece(n1);
-                ChessPiece np2 = curBoard.getPiece(n2);
-                ChessPiece np3 = curBoard.getPiece(n3);
-                if (np1 == null && np2 == null && np3 == null) {
-                    ChessGame copyGame = this.clone();
-                    ChessMove castle = new ChessMove(startPosition, new ChessPosition(1, 2), null);
-                    copyGame.doMove(castle);
-                    if (!copyGame.isInCheck(piece.getTeamColor())) {
-                        copyGame = this.clone();
-                        castle = new ChessMove(startPosition, new ChessPosition(1, 4), null);
-                        copyGame.doMove(castle);
-                        if (!copyGame.isInCheck(piece.getTeamColor())) {
-                            copyGame = this.clone();
-                            castle = new ChessMove(startPosition, new ChessPosition(1, 3), null);
-                            copyGame.doMove(castle);
-                            if (!copyGame.isInCheck(piece.getTeamColor())) {
-                                castle.setCastle(true);
-                                vMoves.add(castle);
-                            }
-                        }
-                    }
-                }
-            }
+           queensideCastle(vMoves,startPosition,piece,1);
         }
-
         if(blackCastleQueenside) {
-            if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                ChessPosition n1 = new ChessPosition(8, 2);
-                ChessPosition n2 = new ChessPosition(8, 3);
-                ChessPosition n3 = new ChessPosition(8, 4);
-                ChessPiece np1 = curBoard.getPiece(n1);
-                ChessPiece np2 = curBoard.getPiece(n2);
-                ChessPiece np3 = curBoard.getPiece(n3);
-                if (np1 == null && np2 == null && np3 == null) {
-                    ChessGame copyGame = this.clone();
-                    ChessMove castle = new ChessMove(startPosition, new ChessPosition(8, 2), null);
-                    copyGame.doMove(castle);
-                    if (!copyGame.isInCheck(piece.getTeamColor())) {
-                        copyGame = this.clone();
-                        castle = new ChessMove(startPosition, new ChessPosition(8, 4), null);
-                        copyGame.doMove(castle);
-                        if (!copyGame.isInCheck(piece.getTeamColor())) {
-                            copyGame = this.clone();
-                            castle = new ChessMove(startPosition, new ChessPosition(8, 3), null);
-                            copyGame.doMove(castle);
-                            if (!copyGame.isInCheck(piece.getTeamColor())) {
-                                castle.setCastle(true);
-                                vMoves.add(castle);
-                            }
-                        }
-                    }
-                }
-            }
+            queensideCastle(vMoves,startPosition,piece,8);
         }
-
     }
 
     public void updateCastle(ChessMove move){
