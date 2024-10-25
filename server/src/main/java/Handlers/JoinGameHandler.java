@@ -1,6 +1,8 @@
 package handlers;
 
 import dataaccess.UnauthorisedException;
+import handlers.Requests.JoinGameRequest;
+import handlers.Responses.ErrorResponse;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -43,7 +45,3 @@ public class JoinGameHandler implements Route {
     }
 }
 
-class JoinGameRequest {
-    public String playerColor;
-    public int gameID;
-}

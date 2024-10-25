@@ -1,5 +1,8 @@
 package handlers;
 
+import handlers.Requests.LoginRequest;
+import handlers.Responses.ErrorResponse;
+import handlers.Responses.LoginResponse;
 import spark.Request;
 import spark.Response;
 import service.UserService;
@@ -32,21 +35,6 @@ public class LoginHandler implements Route {
         } catch (DataAccessException e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }
-    }
-}
-
-class LoginRequest {
-    public String username;
-    public String password;
-}
-
-class LoginResponse {
-    public String authToken;
-    public String username;
-
-    public LoginResponse(String authToken, String username) {
-        this.authToken = authToken;
-        this.username = username;
     }
 }
 

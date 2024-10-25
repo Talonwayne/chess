@@ -1,5 +1,8 @@
 package handlers;
 
+import handlers.Requests.RegisterRequest;
+import handlers.Responses.ErrorResponse;
+import handlers.Responses.LoginResponse;
 import spark.Request;
 import spark.Response;
 import service.UserService;
@@ -48,8 +51,3 @@ public class RegisterHandler implements Route {
     }
 }
 
-class RegisterRequest {
-    public String username;
-    public String password;
-    public String email;
-}

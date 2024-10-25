@@ -1,5 +1,6 @@
 package handlers;
 
+import handlers.Responses.ErrorResponse;
 import spark.Request;
 import spark.Response;
 import service.UserService;

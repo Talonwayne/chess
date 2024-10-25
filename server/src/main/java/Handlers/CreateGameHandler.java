@@ -1,6 +1,9 @@
 package handlers;
 
 import dataaccess.UnauthorisedException;
+import handlers.Requests.CreateGameRequest;
+import handlers.Responses.CreateGameResponse;
+import handlers.Responses.ErrorResponse;
 import service.GameService;
 import spark.Request;
 import spark.Response;
@@ -41,12 +44,3 @@ public class CreateGameHandler implements Route {
     }
 }
 
-class CreateGameRequest {
-    public String gameName;
-}
-class CreateGameResponse{
-    public int gameID;
-    CreateGameResponse(int gameID) {
-        this.gameID = gameID;
-    }
-}

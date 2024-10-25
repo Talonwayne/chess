@@ -1,15 +1,13 @@
 package handlers;
 
 import dataaccess.UnauthorisedException;
-import model.GameData;
+import handlers.Responses.ErrorResponse;
+import handlers.Responses.ListGamesResponse;
 import service.GameService;
 import spark.Request;
 import spark.Response;
 import service.UserService;
 import spark.Route;
-
-import java.util.HashSet;
-import java.util.List;
 
 public class ListGamesHandler implements Route {
     private static UserService userService;
@@ -36,9 +34,3 @@ public class ListGamesHandler implements Route {
     }
 }
 
-class ListGamesResponse{
-    public HashSet<GameData> games;
-    ListGamesResponse(HashSet<GameData> games) {
-        this.games = games;
-    }
-}
