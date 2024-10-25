@@ -1,55 +1,18 @@
 package dataaccess;
 
-import chess.ChessGame;
 import model.GameData;
 
-import java.nio.file.FileAlreadyExistsException;
-import java.util.*;
+import java.util.HashSet;
 
-public  class GameDAO {
-    private HashSet<GameData> games;
-    private int number;
+public interface GameDAO {
+    void clear();
 
-    public GameDAO(){
-        this.number = 1;
-        this.games = new HashSet<>();
-    }
+    GameData getGame(int gameID) throws DataAccessException;
 
-    public  void clear(){
-        games.clear();
-    }
+    int createGame(String gameName) throws DataAccessException;
 
-    public  GameData getGame(int gameID) throws InputMismatchException, DataAccessException {
-        if (games == null || games.isEmpty()){
-            throw new DataAccessException("List games is empty");
-        }
-        for (GameData game:games){
-            if(game.gameID() == gameID){
-                return game;
-            }
-        }
-        throw new InputMismatchException("Game ID does not Exist");
-    }
+    HashSet<GameData> listGames() throws DataAccessException;
 
-    public  int createGame(String gameName) throws FileAlreadyExistsException {
-        for (GameData game:games){
-            if(game.gameName().equals(gameName)){
-                throw new FileAlreadyExistsException("GameName already exists");
-            }
-        }
-        int gameID = number;
-        number++;
-        games.add(new GameData(gameID,null,null,gameName,new ChessGame()));
-        return gameID;
-    }
+    void updateGame(int gameID,GameData updatedGame) throws DataAccessException;
 
-    public  HashSet<GameData> listGames(){
-        return games;
-    }
-
-    public  void updateGame(int gameID, GameData updatedGame) throws DataAccessException{
-        GameData oldGame = getGame(gameID);
-        games.remove(oldGame);
-        games.add(updatedGame);
-    }
 }
