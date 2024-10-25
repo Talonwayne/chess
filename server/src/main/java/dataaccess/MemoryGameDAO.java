@@ -6,7 +6,7 @@ import model.GameData;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
-public  class MemoryGameDAO {
+public  class MemoryGameDAO implements GameDAO{
     private HashSet<GameData> games;
     private int number;
 

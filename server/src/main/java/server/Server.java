@@ -37,6 +37,10 @@ public class Server {
         JoinGameHandler.setGameService(gameService);
     }
 
+    public void setDataAccess(boolean sql){
+
+    }
+
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 

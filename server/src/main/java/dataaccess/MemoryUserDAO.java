@@ -4,7 +4,7 @@ import model.UserData;
 
 import java.util.HashSet;
 
-public class MemoryUserDAO {
+public class MemoryUserDAO implements UserDAO{
     private HashSet<UserData> users;
 
     public MemoryUserDAO(){
