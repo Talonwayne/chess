@@ -3,23 +3,21 @@ package handlers;
 import handlers.Requests.RegisterRequest;
 import handlers.Responses.ErrorResponse;
 import handlers.Responses.LoginResponse;
+import service.Service;
 import spark.Request;
 import spark.Response;
-import service.UserService;
 import spark.Route;
 import model.AuthData;
 import dataaccess.DataAccessException;
 import dataaccess.UnauthorisedException;
 
 public class RegisterHandler implements Route {
-    private static UserService userService;
+    private static Service service;
 
-    public static void setUserService(UserService service) {
-        userService = service;
-    }
+    public static void setService(Service hservice) {service = hservice;}
 
     @Override
-    public Object handle(Request req, Response res) throws Exception {
+    public Object handle(Request req, Response res) {
         String requestBody = req.body();
         RegisterRequest registerRequest = JsonSerializer.fromJson(requestBody, RegisterRequest.class);
         
@@ -27,13 +25,13 @@ public class RegisterHandler implements Route {
             return JsonSerializer.makeSparkResponse(400, res, new ErrorResponse("Error: bad request"));
         }
         
-        String username = registerRequest.username;
-        String password = registerRequest.password;
-        String email = registerRequest.email;
+        String username = registerRequest.username();
+        String password = registerRequest.password();
+        String email = registerRequest.email();
         
         try {
-            userService.register(username, password, email);
-            AuthData authData = userService.login(username, password);
+            service.register(username, password, email);
+            AuthData authData = service.login(username, password);
             LoginResponse loginResponse = new LoginResponse(authData.authToken(), authData.username());
             return JsonSerializer.makeSparkResponse(200, res, loginResponse);
         } catch (UnauthorisedException e) {
@@ -45,9 +43,9 @@ public class RegisterHandler implements Route {
 
     private boolean isValidInput(RegisterRequest request) {
         return request != null &&
-               request.username != null && !request.username.isEmpty() &&
-               request.password != null && !request.password.isEmpty() &&
-               request.email != null && !request.email.isEmpty();
+               request.username() != null && !request.username().isEmpty() &&
+               request.password() != null && !request.password().isEmpty() &&
+               request.email() != null && !request.email().isEmpty();
     }
 }
 

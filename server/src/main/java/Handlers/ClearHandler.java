@@ -1,25 +1,24 @@
 package handlers;
 
+import handlers.Responses.ErrorResponse;
+import service.Service;
 import spark.Request;
 import spark.Response;
-import service.DatabaseService;
-import java.util.HashMap;
-import java.util.Map;
+import spark.Route;
 
-public class ClearHandler {
-    private static DatabaseService databaseService;
+public class ClearHandler implements Route {
+    private static Service service;
 
-    public static void setDatabaseService(DatabaseService service) {
-        databaseService = service;
-    }
+    public static void setService(Service hservice) {service = hservice;}
 
-    public static Object handle(Request req, Response res) {
+    @Override
+    public Object handle(Request req, Response res) {
         res.type("application/json");
         try {
-            databaseService.clearAllData();
+            service.clearAllData();
             return "{}";
         } catch (Exception e) {
-            return JsonSerializer.makeSparkResponse(500, res, Map.of("message", "Error: " + e.getMessage()));
+            return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse(e.getMessage()));
         }
     }
 }

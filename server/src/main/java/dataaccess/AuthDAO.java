@@ -11,6 +11,6 @@ public interface AuthDAO {
 
     String getUsername(String authToken) throws DataAccessException;
 
-
+    void deleteAuth(String authToken) throws DataAccessException;
 
 }

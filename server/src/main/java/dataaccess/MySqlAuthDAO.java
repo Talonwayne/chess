@@ -8,4 +8,8 @@ public class MySqlAuthDAO implements AuthDAO{
     boolean validateAuth(String authToken) throws DataAccessException {
         return false;
     }
+
+    void deleteAuth(String AuthToken) throws DataAccessException{
+
+    }
 }

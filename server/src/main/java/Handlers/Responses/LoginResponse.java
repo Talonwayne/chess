@@ -1,1 +1,3 @@
-record LoginResponse (String authToken, String username){}
+package handlers.Responses;
+
+public record LoginResponse (String authToken, String username){}

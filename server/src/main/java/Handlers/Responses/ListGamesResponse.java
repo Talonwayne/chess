@@ -4,4 +4,4 @@ import model.GameData;
 
 import java.util.HashSet;
 
-record ListGamesResponse (HashSet<GameData> games){}
+public record ListGamesResponse (HashSet<GameData> games){}

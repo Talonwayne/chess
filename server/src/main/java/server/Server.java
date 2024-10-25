@@ -1,44 +1,25 @@
 package server;
 
+import service.Service;
 import spark.*;
 import handlers.*;
-import dataaccess.UserDAO;
-import dataaccess.GameDAO;
-import dataaccess.AuthDAO;
-import service.DatabaseService;
-import service.UserService;
-import service.GameService;
 
 public class Server {
-    private final DatabaseService databaseService;
+    private final Service service;
 
-    public Server() {
-        this.databaseService = new DatabaseService(
-            new UserDAO(),
-            new GameDAO(),
-            new AuthDAO()
-        );
-        ClearHandler.setDatabaseService(this.databaseService);
-        initializeServices();
+    public Server(Service service) {
+        this.service = service;
+        giveHandlersTheService();
     }
 
-    private void initializeServices() {
-        UserService userService = new UserService(databaseService.getUserDAO(), databaseService.getAuthDAO());
-        GameService gameService = new GameService(databaseService.getUserDAO(), databaseService.getAuthDAO(), databaseService.getGameDAO());
-
-        RegisterHandler.setUserService(userService);
-        LoginHandler.setUserService(userService);
-        LogoutHandler.setUserService(userService);
-        ListGamesHandler.setUserService(userService);
-        ListGamesHandler.setGameService(gameService);
-        CreateGameHandler.setUserService(userService);
-        CreateGameHandler.setGameService(gameService);
-        JoinGameHandler.setUserService(userService);
-        JoinGameHandler.setGameService(gameService);
-    }
-
-    public void setDataAccess(boolean sql){
-
+    private void giveHandlersTheService() {
+        RegisterHandler.setService(service);
+        LoginHandler.setService(service);
+        LogoutHandler.setService(service);
+        ListGamesHandler.setService(service);
+        CreateGameHandler.setService(service);
+        JoinGameHandler.setService(service);
+        ClearHandler.setService(service);
     }
 
     public int run(int desiredPort) {
@@ -53,7 +34,7 @@ public class Server {
         Spark.get("/game", new ListGamesHandler());
         Spark.post("/game", new CreateGameHandler());
         Spark.put("/game", new JoinGameHandler());
-        Spark.delete("/db", ClearHandler::handle); 
+        Spark.delete("/db", new ClearHandler());
 
         Spark.init();
         Spark.awaitInitialization();
@@ -63,6 +44,5 @@ public class Server {
 
     public void stop() {
         Spark.stop();
-        Spark.awaitStop();
     }
 }

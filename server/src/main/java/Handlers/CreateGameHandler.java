@@ -1,46 +1,43 @@
 package handlers;
 
-import dataaccess.UnauthorisedException;
+import dataaccess.DataAccessException;
 import handlers.Requests.CreateGameRequest;
 import handlers.Responses.CreateGameResponse;
 import handlers.Responses.ErrorResponse;
-import service.GameService;
+import service.Service;
 import spark.Request;
 import spark.Response;
-import service.UserService;
 import spark.Route;
 
-import java.nio.file.FileAlreadyExistsException;
-
 public class CreateGameHandler implements Route {
-    private static UserService userService;
-    private static GameService gameService;
+    private static Service service;
 
-    public static void setUserService(UserService service) {
-        userService = service;
-    }
-    public static void setGameService(GameService service) {
-        gameService = service;
-    }
+    public static void setService(Service hservice) {service = hservice;}
 
     @Override
-    public Object handle(Request req, Response res) throws Exception {
+    public Object handle(Request req, Response res) {
         String requestBody = req.body();
         String authToken = req.headers("authorization");
 
         CreateGameRequest createGameRequest = JsonSerializer.fromJson(requestBody, CreateGameRequest.class);
 
-        try {
-            Validator.isValidAuth(authToken,userService.getAuthDAO());
-            int gameID = gameService.createGame(createGameRequest.gameName);
-            return JsonSerializer.makeSparkResponse(200, res, new CreateGameResponse(gameID));
-        }catch (UnauthorisedException e){
+        try{
+            service.isValidAuth(authToken);
+        } catch (DataAccessException e){
             return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
-        } catch (FileAlreadyExistsException e){
-            return JsonSerializer.makeSparkResponse(400, res, new ErrorResponse("Error: bad request"));
+        }
+
+        try {
+            int gameID = service.createGame(createGameRequest.gameName());
+            return JsonSerializer.makeSparkResponse(200, res, new CreateGameResponse(gameID));
         } catch (Exception e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }
+        /*
+                catch (FileAlreadyExistsException e){
+                    return JsonSerializer.makeSparkResponse(400, res, new ErrorResponse("Error: bad request"));
+                }
+                */
     }
 }
 

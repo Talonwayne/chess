@@ -13,16 +13,11 @@ public class Service {
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
 
-    public Service(boolean sql) {
-        if(sql) {
-            this.userDAO = new MySqlUserDAO();
-            this.gameDAO = new MySqlGameDAO();
-            this.authDAO = new MySqlAuthDAO();
-        } else {
-            this.userDAO = new MemoryUserDAO();
-            this.gameDAO = new MemoryGameDAO();
-            this.authDAO = new MemoryAuthDAO();
-        }
+    public Service(UserDAO userDAO, GameDAO gameDAO, AuthDAO authDAO) {
+        this.authDAO = authDAO;
+        this.gameDAO = gameDAO;
+        this.userDAO = userDAO;
+
     }
 
     public void clearAllData() {
@@ -60,11 +55,11 @@ public class Service {
         }
     }
 
-    public int createGame(String gameName)throws FileAlreadyExistsException{
+    public int createGame(String gameName)throws DataAccessException{
         return gameDAO.createGame(gameName);
     }
 
-    public HashSet<GameData> listGames(){
+    public HashSet<GameData> listGames() throws DataAccessException{
         return gameDAO.listGames();
     }
 
@@ -84,4 +79,7 @@ public class Service {
         authDAO.deleteAuth(authorizationToken);
     }
 
+    public boolean isValidAuth(String authToken) throws DataAccessException {
+        return authDAO.validateAuth(authToken);
+    }
 }

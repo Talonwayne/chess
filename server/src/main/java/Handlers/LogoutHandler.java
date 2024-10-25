@@ -1,30 +1,28 @@
 package handlers;
 
 import handlers.Responses.ErrorResponse;
+import service.Service;
 import spark.Request;
 import spark.Response;
-import service.UserService;
 import spark.Route;
 import dataaccess.DataAccessException;
-import dataaccess.UnauthorisedException;
 
 public class LogoutHandler implements Route {
-    private static UserService userService;
+    private static Service service;
 
-    public static void setUserService(UserService service) {
-        userService = service;
-    }
+    public static void setService(Service hservice) {service = hservice;}
 
     @Override
-    public Object handle(Request req, Response res) throws Exception {
+    public Object handle(Request req, Response res){
         String authToken = req.headers("authorization");
-        
-        try {
-            Validator.isValidAuth(authToken, userService.getAuthDAO());
-            userService.logout(authToken);
-            return "{}";
-        } catch (UnauthorisedException e) {
+        try{
+            service.isValidAuth(authToken);
+        } catch (DataAccessException e){
             return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
+        }
+        try {
+            service.logout(authToken);
+            return "{}";
         } catch (DataAccessException e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }

@@ -1,34 +1,29 @@
 package handlers;
 
-import dataaccess.UnauthorisedException;
+import dataaccess.DataAccessException;
 import handlers.Responses.ErrorResponse;
 import handlers.Responses.ListGamesResponse;
-import service.GameService;
+import service.Service;
 import spark.Request;
 import spark.Response;
-import service.UserService;
 import spark.Route;
 
 public class ListGamesHandler implements Route {
-    private static UserService userService;
-    private static GameService gameService;
+    private static Service service;
 
-    public static void setUserService(UserService service) {
-        userService = service;
-    }
-    public static void setGameService(GameService service) {
-        gameService = service;
-    }
+    public static void setService(Service hservice) {service = hservice;}
 
     @Override
-    public Object handle(Request req, Response res) throws Exception {
+    public Object handle(Request req, Response res) {
         String authToken = req.headers("authorization");
-        try {
-            Validator.isValidAuth(authToken,userService.getAuthDAO());
-            return JsonSerializer.makeSparkResponse(200, res, new ListGamesResponse(gameService.listGames()));
-        } catch (UnauthorisedException e){
+        try{
+            service.isValidAuth(authToken);
+        } catch (DataAccessException e){
             return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
-        } catch (Exception e) {
+        }
+        try {
+            return JsonSerializer.makeSparkResponse(200, res, new ListGamesResponse(service.listGames()));
+        }  catch (Exception e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }
     }

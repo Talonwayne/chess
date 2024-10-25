@@ -29,15 +29,15 @@ public class MemoryUserDAO implements UserDAO{
         users.add(new UserData(username,password,email));
     }
 
-    public UserData getUser(String username) throws UnauthorisedException{
+    public UserData getUser(String username) throws DataAccessException{
         if(users == null || users.isEmpty()){
-            throw new UnauthorisedException("List Users is Empty");
+            throw new DataAccessException("List Users is Empty");
         }
         for (UserData user : users){
             if (user.username().equals(username)){
                 return user;
             }
         }
-        throw new UnauthorisedException("User not Found");
+        throw new DataAccessException("User not Found");
     }
 }
