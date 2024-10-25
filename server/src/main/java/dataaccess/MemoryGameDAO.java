@@ -3,8 +3,8 @@ package dataaccess;
 import chess.ChessGame;
 import model.GameData;
 
-import java.nio.file.FileAlreadyExistsException;
-import java.util.*;
+import java.util.HashSet;
+
 
 public  class MemoryGameDAO implements GameDAO{
     private HashSet<GameData> games;
@@ -19,7 +19,7 @@ public  class MemoryGameDAO implements GameDAO{
         games.clear();
     }
 
-    public  GameData getGame(int gameID) throws InputMismatchException, DataAccessException {
+    public  GameData getGame(int gameID) throws DataAccessException {
         if (games == null || games.isEmpty()){
             throw new DataAccessException("List games is empty");
         }
@@ -28,13 +28,13 @@ public  class MemoryGameDAO implements GameDAO{
                 return game;
             }
         }
-        throw new InputMismatchException("Game ID does not Exist");
+        throw new DataAccessException("Game ID does not Exist");
     }
 
-    public  int createGame(String gameName) throws FileAlreadyExistsException {
+    public  int createGame(String gameName) throws DataAccessException {
         for (GameData game:games){
             if(game.gameName().equals(gameName)){
-                throw new FileAlreadyExistsException("GameName already exists");
+                throw new DataAccessException("GameName already exists");
             }
         }
         int gameID = number;

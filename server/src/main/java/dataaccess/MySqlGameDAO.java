@@ -1,27 +1,30 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.HashSet;
 
 public class MySqlGameDAO implements GameDAO{
-    void clear(){
+    public void clear(){
 
     }
 
-    GameData getGame(int gameID) throws DataAccessException{
+    public GameData getGame(int gameID) throws DataAccessException{
+        ChessGame c = new ChessGame();
+        return new GameData(123,"","","", c);
+    }
+
+    public int createGame(String gameName) throws DataAccessException{
+        return 1232;
 
     }
 
-    int createGame(String gameName) throws DataAccessException{
-
+    public HashSet<GameData> listGames() {
+        return new HashSet<GameData>();
     }
 
-    HashSet<GameData> listGames() throws DataAccessException{
-
-    }
-
-    void updateGame(int gameID,GameData updatedGame) throws DataAccessException{
+    public void updateGame(int gameID,GameData updatedGame) throws DataAccessException{
 
     }
 }

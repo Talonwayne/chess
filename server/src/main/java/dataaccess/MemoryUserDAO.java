@@ -15,17 +15,15 @@ public class MemoryUserDAO implements UserDAO{
         users.clear();
     }
 
-    public void createUser(String username, String password, String email) throws DataAccessException, UnauthorisedException{
+    public void createUser(String username, String password, String email) throws DataAccessException{
         if (username.isBlank()|| password.isBlank()||email.isBlank()){
             throw new DataAccessException("Missing Parameter");
         }
-
-            for (UserData user : users) {
-                if (user.username().equals(username)) {
-                    throw new UnauthorisedException("Username already taken");
-                }
+        for (UserData user : users) {
+            if (user.username().equals(username)) {
+                throw new DataAccessException("Username already taken");
             }
-
+        }
         users.add(new UserData(username,password,email));
     }
 

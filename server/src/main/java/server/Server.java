@@ -5,12 +5,16 @@ import spark.*;
 import handlers.*;
 
 public class Server {
-    private final Service service;
+    private Service service;
 
-    public Server(Service service) {
-        this.service = service;
+    public Server() {
+
+    }
+    public void setService(Service hservice){
+        service = hservice;
         giveHandlersTheService();
     }
+
 
     private void giveHandlersTheService() {
         RegisterHandler.setService(service);

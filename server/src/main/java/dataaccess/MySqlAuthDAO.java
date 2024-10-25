@@ -1,15 +1,25 @@
 package dataaccess;
 
+import model.AuthData;
+
 public class MySqlAuthDAO implements AuthDAO{
-    void clear(){}
+    public void clear(){
 
-    void createAuth(String username){}
+    }
 
-    boolean validateAuth(String authToken) throws DataAccessException {
+    public AuthData createAuth(String username){
+        return new AuthData("not","done");
+    }
+
+    public boolean validateAuth(String authToken) throws DataAccessException {
         return false;
     }
 
-    void deleteAuth(String AuthToken) throws DataAccessException{
+    public void deleteAuth(String authToken) throws DataAccessException{
 
+    }
+
+    public String getUsername(String authToken){
+        return "not done";
     }
 }

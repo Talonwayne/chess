@@ -16,7 +16,8 @@ public class Main {
             authDAO = new MySqlAuthDAO();
         }
         Service theService = new Service(userDAO,gameDAO,authDAO);
-        Server s = new Server(theService);
+        Server s = new Server();
+        s.setService(theService);
         s.run(8080);
     }
 }
