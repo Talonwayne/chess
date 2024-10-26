@@ -6,7 +6,6 @@ import model.*;
 
 import java.nio.file.FileAlreadyExistsException;
 import java.util.HashSet;
-import java.util.InputMismatchException;
 
 public class Service {
     private final UserDAO userDAO;
@@ -26,10 +25,9 @@ public class Service {
         authDAO.clear();
     }
 
-    public void joinGame(String authToken, String color, int gameID)
-            throws FileAlreadyExistsException, InputMismatchException, DataAccessException, UnauthorisedException {
+    public void joinGame(String authToken, String color, int gameID) throws DataAccessException, FileAlreadyExistsException {
         if (color == null || color.isEmpty()) {
-            throw new InputMismatchException("Color is empty");
+            throw new DataAccessException("Color is empty");
         }
         GameData desiredGame = gameDAO.getGame(gameID);
         GameData updatedGame;
@@ -59,27 +57,27 @@ public class Service {
         return gameDAO.createGame(gameName);
     }
 
-    public HashSet<GameData> listGames() throws DataAccessException{
+    public HashSet<GameData> listGames() {
         return gameDAO.listGames();
     }
 
-    public AuthData register(String username, String password, String email) throws DataAccessException, UnauthorisedException {
+    public AuthData register(String username, String password, String email) throws DataAccessException {
         userDAO.createUser(username, password, email);
         return login(username, password);
     }
-    public AuthData login(String username, String password) throws DataAccessException, UnauthorisedException {
+    public AuthData login(String username, String password) throws DataAccessException {
         UserData user = userDAO.getUser(username);
         if (user.password().equals(password)) {
             return authDAO.createAuth(username);
         }
-        throw new UnauthorisedException("Invalid username or password");
+        throw new DataAccessException("Invalid username or password");
     }
 
     public void logout(String authorizationToken) throws DataAccessException {
         authDAO.deleteAuth(authorizationToken);
     }
 
-    public boolean isValidAuth(String authToken) throws DataAccessException {
-        return authDAO.validateAuth(authToken);
+    public void isValidAuth(String authToken) throws DataAccessException {
+        authDAO.validateAuth(authToken);
     }
 }

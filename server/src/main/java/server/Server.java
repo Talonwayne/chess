@@ -1,5 +1,8 @@
 package server;
 
+import dataaccess.MemoryAuthDAO;
+import dataaccess.MemoryGameDAO;
+import dataaccess.MemoryUserDAO;
 import service.Service;
 import spark.*;
 import handlers.*;
@@ -8,13 +11,13 @@ public class Server {
     private Service service;
 
     public Server() {
-
+        this.service = new Service(new MemoryUserDAO(), new MemoryGameDAO(), new MemoryAuthDAO());
+        giveHandlersTheService();
     }
     public void setService(Service hservice){
         service = hservice;
         giveHandlersTheService();
     }
-
 
     private void giveHandlersTheService() {
         RegisterHandler.setService(service);
