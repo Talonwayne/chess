@@ -9,7 +9,6 @@ import spark.Response;
 import spark.Route;
 import model.AuthData;
 import dataaccess.DataAccessException;
-import dataaccess.UnauthorisedException;
 
 public class RegisterHandler implements Route {
     private static Service service;
