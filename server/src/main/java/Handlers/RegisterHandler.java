@@ -30,13 +30,12 @@ public class RegisterHandler implements Route {
         String email = registerRequest.email();
         
         try {
-            service.register(username, password, email);
-            AuthData authData = service.login(username, password);
+            AuthData authData = service.register(username, password, email);
             LoginResponse loginResponse = new LoginResponse(authData.authToken(), authData.username());
             return JsonSerializer.makeSparkResponse(200, res, loginResponse);
-        } catch (UnauthorisedException e) {
-            return JsonSerializer.makeSparkResponse(403, res, new ErrorResponse("Error: already taken"));
         } catch (DataAccessException e) {
+            return JsonSerializer.makeSparkResponse(403, res, new ErrorResponse("Error: already taken"));
+        } catch (Exception e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }
     }

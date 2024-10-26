@@ -9,7 +9,6 @@ import spark.Response;
 import spark.Route;
 import model.AuthData;
 import dataaccess.DataAccessException;
-import dataaccess.UnauthorisedException;
 
 public class LoginHandler implements Route {
     private static Service service;
@@ -28,9 +27,9 @@ public class LoginHandler implements Route {
             AuthData authData = service.login(username, password);
             LoginResponse loginResponse = new LoginResponse(authData.authToken(), authData.username());
             return JsonSerializer.makeSparkResponse(200, res, loginResponse);
-        } catch (UnauthorisedException e) {
-            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
         } catch (DataAccessException e) {
+            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
+        } catch (Exception e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }
     }

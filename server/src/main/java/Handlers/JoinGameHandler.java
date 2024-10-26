@@ -9,7 +9,6 @@ import spark.Response;
 import spark.Route;
 
 import java.nio.file.FileAlreadyExistsException;
-import java.util.InputMismatchException;
 
 public class JoinGameHandler implements Route {
     private static Service service;
@@ -33,7 +32,7 @@ public class JoinGameHandler implements Route {
             return "{}";
         }catch (FileAlreadyExistsException e) {
             return JsonSerializer.makeSparkResponse(403, res, new ErrorResponse("Error: already taken"));
-        }catch (InputMismatchException e){
+        }catch (DataAccessException e){
             return JsonSerializer.makeSparkResponse(400, res, new ErrorResponse("Error: bad request"));
         } catch (Exception e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
