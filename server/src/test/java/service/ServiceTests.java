@@ -43,7 +43,7 @@ public class ServiceTests {
 
     @Test
     public void testLoginPositive() throws Exception {
-        service.register("testUser", "password", "test@example.com");
+        service.register("test", "password1", "test@example.com");
         AuthData authData = service.login("testUser", "password");
         assertNotNull(authData);
         assertEquals("testUser", authData.username());
