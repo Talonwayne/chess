@@ -17,7 +17,12 @@ public  class MemoryAuthDAO implements AuthDAO{
         auths.clear();
     }
 
-    public AuthData createAuth(String username){
+    public AuthData createAuth(String username) throws DataAccessException{
+        for (AuthData auth: auths){
+            if(auth.username().equals(username)){
+                throw new DataAccessException("Auth Already exists");
+            }
+        }
         String authToken = UUID.randomUUID().toString();
         AuthData newAuth = new AuthData(authToken, username);
         auths.add(newAuth);

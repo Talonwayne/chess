@@ -2,7 +2,6 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
-
 import java.util.HashSet;
 
 public class MySqlGameDAO implements GameDAO{
@@ -27,4 +26,23 @@ public class MySqlGameDAO implements GameDAO{
     public void updateGame(int gameID,GameData updatedGame) throws DataAccessException{
 
     }
+
+    private final String[] createStatements = {
+            """
+            CREATE TABLE IF NOT EXISTS  auths (
+              `id` int NOT NULL AUTO_INCREMENT,
+              'gameID' int NOT NULL,
+              `whiteUsername` varchar(256),
+              `blackUsername` varchar(256),
+              'gameName' varchar(256),
+              'ChessGameJson' TEXT DEFAULT NULL,
+              PRIMARY KEY (`id`),
+              INDEX(gameID),
+              INDEX(whiteUsername)
+              INDEX(blackUsername)
+              INDEX(gameName)
+              INDEX(ChessGameJson)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+    };
 }
