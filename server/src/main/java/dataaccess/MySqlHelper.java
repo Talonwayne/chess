@@ -1,6 +1,8 @@
 package dataaccess;
 
 import com.google.gson.Gson;
+
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
@@ -18,6 +20,26 @@ public class MySqlHelper {
 
     public static String toJson(Object obj) {
         return GSON.toJson(obj);
+    }
+
+    public ResultSet executeQuery(String statement, Object... params) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i];
+                    if (param instanceof String p) {
+                        ps.setString(i + 1, p);
+                    } else if (param instanceof Integer p) {
+                        ps.setInt(i + 1, p);
+                    } else if (param == null) {
+                        ps.setNull(i + 1, NULL);
+                    }
+                }
+                return ps.executeQuery();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("unable to execute query: " + statement + ", " + e.getMessage());
+        }
     }
 
     public int executeUpdate(String statement, Object... params) throws DataAccessException {

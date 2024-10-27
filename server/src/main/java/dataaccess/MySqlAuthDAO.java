@@ -22,6 +22,7 @@ public class MySqlAuthDAO implements AuthDAO{
     public MySqlAuthDAO(){
         try {
             helper = new MySqlHelper(createStatements);
+            helper.configureDatabase();
         }catch (Exception e){
             int i = 1;
         }
@@ -49,28 +50,35 @@ public class MySqlAuthDAO implements AuthDAO{
     }
 
     public boolean validateAuth(String authToken) throws DataAccessException {
-        var statement = "SELECT EXISTS(SELECT 1 FROM auths WHERE authToken = '" +authToken +"') AS object_exists";
-        try{
-            return helper.executeUpdate(statement) == 1;
-        } catch (DataAccessException e ){
-            return false;
+        var statement = "SELECT EXISTS(SELECT 1 FROM auths WHERE authToken = ?) AS object_exists"; // Use parameterized query
+        try {
+            return helper.executeUpdate(statement, authToken) == 1; // Pass authToken as parameter
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error validating auth token: " + e.getMessage());
         }
     }
 
-    public void deleteAuth(String authToken) throws DataAccessException{
-        var statement = "DELETE FROM auths\n" +
-                        "WHERE authToken = " + authToken;
-        var id = helper.executeUpdate(statement);
+    public void deleteAuth(String authToken) throws DataAccessException {
+        var statement = "DELETE FROM auths WHERE authToken = ?"; // Use parameterized query
+        try {
+            helper.executeUpdate(statement, authToken); // Pass authToken as parameter
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error deleting auth token: " + e.getMessage());
+        }
     }
 
-    public String getUsername(String authToken){
+    public String getUsername(String authToken) throws DataAccessException{
         var statement = "SELECT username FROM auths WHERE authToken=?";
-        try{
-            return helper.executeUpdate(statement, authToken);
-        } catch (DataAccessException e ){
-            int i = 1;
+        try {
+            var resultSet = helper.executeQuery(statement, authToken);
+            if (resultSet.next()) {
+                return resultSet.getString("username"); 
+            }
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Error retrieving username: " + e.getMessage());
+        } catch (SQLException e) {
+            throw new DataAccessException("Error of SQL " + e.getMessage());
         }
+        return null;
     }
-
-
 }
