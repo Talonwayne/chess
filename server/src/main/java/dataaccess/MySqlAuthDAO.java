@@ -65,7 +65,11 @@ public class MySqlAuthDAO implements AuthDAO{
 
     public String getUsername(String authToken){
         var statement = "SELECT username FROM auths WHERE authToken=?";
-        return "not done";
+        try{
+            return helper.executeUpdate(statement, authToken);
+        } catch (DataAccessException e ){
+            int i = 1;
+        }
     }
 
 
