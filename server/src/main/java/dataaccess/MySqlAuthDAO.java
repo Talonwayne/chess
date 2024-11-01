@@ -50,14 +50,13 @@ public class MySqlAuthDAO implements AuthDAO{
         try (var resultSet = helper.executeQuery(statement, authToken)) {
             if (resultSet.next()) {
                 int count = resultSet.getInt("token_exists");
-                return count > 0;
+                return count == 1;
             }
             return false;
         } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException("Error checking auth token existence: " + e.getMessage());
+            throw new DataAccessException("Error checking authToken: " + e.getMessage());
         }
     }
-
 
     public void deleteAuth(String authToken) throws DataAccessException {
         var statement = "DELETE FROM auths WHERE authToken = ?"; // Use parameterized query

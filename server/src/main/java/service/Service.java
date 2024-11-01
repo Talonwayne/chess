@@ -83,7 +83,7 @@ public class Service {
         authDAO.deleteAuth(authorizationToken);
     }
 
-    public void isValidAuth(String authToken) throws DataAccessException {
-        authDAO.validateAuth(authToken);
+    public boolean isValidAuth(String authToken) throws DataAccessException {
+        return authDAO.validateAuth(authToken);
     }
 }
