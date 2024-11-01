@@ -20,7 +20,7 @@ public class MySqlAuthDAO implements AuthDAO{
         try {
             helper = new MySqlHelper(createStatements);
         }catch (Exception e){
-            int i = 1;
+            System.out.println("Auth Helper Failed to init");
         }
     }
 
@@ -29,7 +29,7 @@ public class MySqlAuthDAO implements AuthDAO{
         try {
             helper.executeUpdate(statement);
         } catch (DataAccessException e){
-            int i = 1;
+            System.out.println("auth Clear Failed");
         }
     }
 
@@ -38,9 +38,9 @@ public class MySqlAuthDAO implements AuthDAO{
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, username);
         try{
-            var id = helper.executeUpdate(statement, authData.authToken(), authData.username());
+            helper.executeUpdate(statement, authData.authToken(), authData.username());
         } catch (DataAccessException e ){
-            int i = 1;
+            throw new DataAccessException("SQL BROKE");
         }
         return authData;
     }

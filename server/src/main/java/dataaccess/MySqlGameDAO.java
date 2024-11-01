@@ -26,7 +26,7 @@ public class MySqlGameDAO implements GameDAO{
         try {
             helper = new MySqlHelper(createStatements);
         }catch (Exception e){
-            int i = 1;
+            System.out.println("Helper failed to build");
         }
     }
 
@@ -35,7 +35,7 @@ public class MySqlGameDAO implements GameDAO{
         try {
             helper.executeUpdate(statement);
         } catch (DataAccessException e){
-            int i = 1;
+            System.out.println("Failed to Clear DB");
         }
     }
 
@@ -49,7 +49,7 @@ public class MySqlGameDAO implements GameDAO{
                     resultSet.getString("whiteUsername"),
                     resultSet.getString("blackUsername"),
                     resultSet.getString("gameName"),
-                    helper.fromJson(resultSet.getString("ChessGameJson"), ChessGame.class)
+                    MySqlHelper.fromJson(resultSet.getString("ChessGameJson"), ChessGame.class)
                 );
             }
         } catch (DataAccessException e) {
@@ -75,19 +75,16 @@ public class MySqlGameDAO implements GameDAO{
         try {
             var resultSet = helper.executeQuery(statement);
             while (resultSet.next()) {
-                ChessGame chessGame = new ChessGame(); 
                 games.add(new GameData(
                     resultSet.getInt("gameID"),
                     resultSet.getString("whiteUsername"),
                     resultSet.getString("blackUsername"),
                     resultSet.getString("gameName"),
-                    helper.fromJson(resultSet.getString("ChessGameJson"), ChessGame.class)
+                    MySqlHelper.fromJson(resultSet.getString("ChessGameJson"), ChessGame.class)
                 ));
             }
-        } catch (DataAccessException e) {
-            int i = 1;
-        } catch (SQLException e) {
-            int i = 1;
+        } catch (DataAccessException| SQLException e) {
+            System.out.println("listGames failed");
         }
         return games;
     }
