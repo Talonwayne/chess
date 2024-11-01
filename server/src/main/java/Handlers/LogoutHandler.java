@@ -15,12 +15,11 @@ public class LogoutHandler implements Route {
     @Override
     public Object handle(Request req, Response res){
         String authToken = req.headers("authorization");
-        try{
-            service.isValidAuth(authToken);
-        } catch (DataAccessException e){
-            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
-        }
+
         try {
+            if(!service.isValidAuth(authToken)){
+                return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
+            }
             service.logout(authToken);
             return "{}";
         } catch (DataAccessException e) {

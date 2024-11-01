@@ -30,6 +30,9 @@ public class Service {
             throw new DataAccessException("Color is empty");
         }
         GameData desiredGame = gameDAO.getGame(gameID);
+        if (desiredGame == null){
+            throw new DataAccessException("Bad gameID");
+        }
         GameData updatedGame;
         String whitePlayer = desiredGame.whiteUsername();
         String blackPlayer = desiredGame.blackUsername();

@@ -16,12 +16,11 @@ public class ListGamesHandler implements Route {
     @Override
     public Object handle(Request req, Response res) {
         String authToken = req.headers("authorization");
-        try{
-            service.isValidAuth(authToken);
-        } catch (DataAccessException e){
-            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
-        }
+
         try {
+            if(!service.isValidAuth(authToken)){
+                return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
+            }
             return JsonSerializer.makeSparkResponse(200, res, new ListGamesResponse(service.listGames()));
         }  catch (Exception e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));

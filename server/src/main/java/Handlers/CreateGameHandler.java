@@ -20,14 +20,10 @@ public class CreateGameHandler implements Route {
         String authToken = req.headers("authorization");
 
         CreateGameRequest createGameRequest = JsonSerializer.fromJson(requestBody, CreateGameRequest.class);
-
-        try{
-            service.isValidAuth(authToken);
-        } catch (DataAccessException e){
-            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
-        }
-
         try {
+            if(!service.isValidAuth(authToken)){
+                return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
+            }
             int gameID = service.createGame(createGameRequest.gameName());
             return JsonSerializer.makeSparkResponse(200, res, new CreateGameResponse(gameID));
         } catch (Exception e) {

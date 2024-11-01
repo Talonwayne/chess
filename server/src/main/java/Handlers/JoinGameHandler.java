@@ -20,14 +20,10 @@ public class JoinGameHandler implements Route {
         String requestBody = req.body();
         String authToken = req.headers("authorization");
         JoinGameRequest joinGameRequest = JsonSerializer.fromJson(requestBody, JoinGameRequest.class);
-
-        try{
-            service.isValidAuth(authToken);
-        } catch (DataAccessException e){
-            return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
-        }
-
         try {
+            if(!service.isValidAuth(authToken)){
+                return JsonSerializer.makeSparkResponse(401, res, new ErrorResponse("Error: unauthorized"));
+            }
             service.joinGame(authToken,joinGameRequest.playerColor(), joinGameRequest.gameID());
             return "{}";
         }catch (FileAlreadyExistsException e) {
