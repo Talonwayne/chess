@@ -38,4 +38,14 @@ public class MemoryUserDAO implements UserDAO{
         }
         throw new DataAccessException("User not Found");
     }
+
+    public boolean verifyUser(String username, String providedClearTextPassword){
+        try {
+            String databasePassword = getUser(username).password();
+            return databasePassword.equals(providedClearTextPassword);
+        }catch (DataAccessException e){
+            return false;
+        }
+    }
+
 }

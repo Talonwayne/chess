@@ -12,6 +12,11 @@ public class MySqlHelper {
     private static final Gson GSON = new Gson();
     public MySqlHelper(String[] cs){
         createStatements = cs;
+        try {
+            configureDatabase();
+        }catch (DataAccessException e){
+            System.out.println("Error making DB");
+        }
     }
 
     public static <T> T fromJson(String json, Class<T> classIWant) {
@@ -23,20 +28,20 @@ public class MySqlHelper {
     }
 
     public ResultSet executeQuery(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) {
-                        ps.setString(i + 1, p);
-                    } else if (param instanceof Integer p) {
-                        ps.setInt(i + 1, p);
-                    } else if (param == null) {
-                        ps.setNull(i + 1, NULL);
-                    }
+        try  {
+            var conn = DatabaseManager.getConnection();
+            var ps = conn.prepareStatement(statement);
+            for (var i = 0; i < params.length; i++) {
+                var param = params[i];
+                if (param instanceof String p) {
+                    ps.setString(i + 1, p);
+                } else if (param instanceof Integer p) {
+                    ps.setInt(i + 1, p);
+                } else if (param == null) {
+                    ps.setNull(i + 1, NULL);
                 }
-                return ps.executeQuery();
             }
+            return ps.executeQuery();
         } catch (SQLException e) {
             throw new DataAccessException("unable to execute query: " + statement + ", " + e.getMessage());
         }

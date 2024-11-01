@@ -62,12 +62,18 @@ public class Service {
     }
 
     public AuthData register(String username, String password, String email) throws DataAccessException {
-        userDAO.createUser(username, password, email);
-        return login(username, password);
+        if (userDAO.getUser(username) != null){
+            throw new DataAccessException("Duplicate Username");
+        }
+        userDAO.createUser(username,password,email);
+        return login(username,password);
     }
+
+
+
     public AuthData login(String username, String password) throws DataAccessException {
-        UserData user = userDAO.getUser(username);
-        if (user.password().equals(password)) {
+
+        if (userDAO.verifyUser(username,password)) {
             return authDAO.createAuth(username);
         }
         throw new DataAccessException("Invalid username or password");

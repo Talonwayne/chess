@@ -11,27 +11,20 @@ public class MySqlGameDAO implements GameDAO{
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  games (
-              `id` int NOT NULL AUTO_INCREMENT,
-              `gameID` int NOT NULL,
+            CREATE TABLE IF NOT EXISTS games(
+              `gameID` int NOT NULL AUTO_INCREMENT,
               `whiteUsername` varchar(256),
               `blackUsername` varchar(256),
               `gameName` varchar(256),
               `ChessGameJson` TEXT DEFAULT NULL,
-              PRIMARY KEY (`id`),
-              INDEX(gameID),
-              INDEX(whiteUsername),
-              INDEX(blackUsername),
-              INDEX(gameName),
-              INDEX(ChessGameJson)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+              PRIMARY KEY (`gameID`)
+            )
             """
     };
 
     public MySqlGameDAO(){
         try {
             helper = new MySqlHelper(createStatements);
-            helper.configureDatabase();
         }catch (Exception e){
             int i = 1;
         }

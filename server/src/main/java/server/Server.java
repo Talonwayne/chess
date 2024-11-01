@@ -1,8 +1,6 @@
 package server;
 
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import service.Service;
 import spark.*;
 import handlers.*;
@@ -11,7 +9,15 @@ public class Server {
     private Service service;
 
     public Server() {
-        this.service = new Service(new MemoryUserDAO(), new MemoryGameDAO(), new MemoryAuthDAO());
+        try{
+            DatabaseManager.createDatabase();
+        } catch (DataAccessException e){
+            System.out.print("Database not made");
+        }
+        UserDAO userDAO = new MySqlUserDAO();
+        GameDAO gameDAO = new MySqlGameDAO();
+        AuthDAO authDAO = new MySqlAuthDAO();
+        service = new Service(userDAO,gameDAO,authDAO);
         giveHandlersTheService();
     }
     public void setService(Service hservice){
@@ -31,6 +37,7 @@ public class Server {
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
+
 
         Spark.staticFiles.location("web");
 
