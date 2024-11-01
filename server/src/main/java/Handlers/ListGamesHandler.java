@@ -1,6 +1,5 @@
 package handlers;
 
-import dataaccess.DataAccessException;
 import handlers.Responses.ErrorResponse;
 import handlers.Responses.ListGamesResponse;
 import service.Service;
