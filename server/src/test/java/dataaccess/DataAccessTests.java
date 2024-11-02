@@ -40,16 +40,48 @@ public class DataAccessTests {
 
     // MySqlUserDAO Tests
     @Test
-    public void testAllClears() throws DataAccessException {
+    public void testUserClearPositive() throws DataAccessException {
         userDAO.createUser("testUser", "password", "test@example.com");
         userDAO.clear();
+        assertNull(userDAO.getUser("testUser"));
+    }
+
+    @Test
+    public void testAuthClearPositive() throws DataAccessException {
         AuthData auth =  authDAO.createAuth("Test");
         authDAO.clear();
+        assertNull(authDAO.getUsername(auth.authToken()));
+    }
+
+    @Test
+    public void testGameClearPositive() throws DataAccessException {
         int gameID = gameDAO.createGame("test");
         gameDAO.clear();
-        assertNull(authDAO.getUsername(auth.authToken()));
         assertNull(gameDAO.getGame(gameID));
-        assertNull(userDAO.getUser("testUser"));
+    }
+
+    @Test
+    public void testUserClearNegative() throws DataAccessException {
+        userDAO.createUser("testUser", "password", "test@example.com");
+        userDAO.clear();
+        userDAO.createUser("testUser", "password", "test@example.com");
+        assertNotNull(userDAO.getUser("testUser"));
+    }
+
+    @Test
+    public void testAuthClearNegative() throws DataAccessException {
+        authDAO.createAuth("Test");
+        authDAO.clear();
+        AuthData auth =  authDAO.createAuth("Test");
+        assertNotNull(authDAO.getUsername(auth.authToken()));
+    }
+
+    @Test
+    public void testGameClearNegative() throws DataAccessException {
+        gameDAO.createGame("test");
+        gameDAO.clear();
+        int gameID = gameDAO.createGame("test");
+        assertNotNull(gameDAO.getGame(gameID));
     }
 
 
@@ -170,8 +202,8 @@ public class DataAccessTests {
         ChessGame newGame = new ChessGame();
         GameData updatedGame = new GameData(gameId, "white", "black", "TestGame1",newGame);
         gameDAO.updateGame(gameId,updatedGame);
-        GameData DatabaseGame = gameDAO.getGame(gameId);
-        assertEquals(updatedGame,DatabaseGame);
+        GameData databaseGame = gameDAO.getGame(gameId);
+        assertEquals(updatedGame,databaseGame);
     }
 
     @Test
@@ -181,11 +213,7 @@ public class DataAccessTests {
         ChessGame newGame = new ChessGame();
         GameData updatedGame = new GameData(gameId, "white", "black", "TestGame1",newGame);
         gameDAO.updateGame(gameId,updatedGame);
-        GameData DatabaseGame = gameDAO.getGame(gameId);
-        assertNotEquals(oldGame,DatabaseGame);
+        GameData databaseGame = gameDAO.getGame(gameId);
+        assertNotEquals(oldGame,databaseGame);
     }
-
-
-
-
 }
