@@ -2,6 +2,7 @@ package dataaccess;
 
 import com.google.gson.Gson;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -31,16 +32,7 @@ public class MySqlHelper {
         try  {
             var conn = DatabaseManager.getConnection();
             var ps = conn.prepareStatement(statement);
-            for (var i = 0; i < params.length; i++) {
-                var param = params[i];
-                if (param instanceof String p) {
-                    ps.setString(i + 1, p);
-                } else if (param instanceof Integer p) {
-                    ps.setInt(i + 1, p);
-                } else if (param == null) {
-                    ps.setNull(i + 1, NULL);
-                }
-            }
+            setParameters(ps, params);
             return ps.executeQuery();
         } catch (SQLException e) {
             throw new DataAccessException("unable to execute query: " + statement + ", " + e.getMessage());
@@ -50,16 +42,7 @@ public class MySqlHelper {
     public int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p){
-                        ps.setString(i + 1, p);
-                    } else if (param instanceof Integer p) {
-                        ps.setInt(i + 1, p);
-                    } else if (param == null) {
-                        ps.setNull(i + 1, NULL);
-                    }
-                }
+                setParameters(ps, params);
                 ps.executeUpdate();
 
                 var rs = ps.getGeneratedKeys();
@@ -71,6 +54,19 @@ public class MySqlHelper {
             }
         } catch (SQLException e) {
             throw new DataAccessException("unable to update database: %s, %s" + statement + e.getMessage());
+        }
+    }
+
+    private void setParameters(PreparedStatement ps, Object... params) throws SQLException {
+        for (var i = 0; i < params.length; i++) {
+            var param = params[i];
+            if (param instanceof String p) {
+                ps.setString(i + 1, p);
+            } else if (param instanceof Integer p) {
+                ps.setInt(i + 1, p);
+            } else if (param == null) {
+                ps.setNull(i + 1, NULL);
+            }
         }
     }
     

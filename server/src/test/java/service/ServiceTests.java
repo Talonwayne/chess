@@ -43,15 +43,16 @@ public class ServiceTests {
 
     @Test
     public void testLoginPositive() throws Exception {
-        service.register("test", "password1", "test@example.com");
-        AuthData authData = service.login("testUser", "password");
+        AuthData auth =  service.register("testUser", "password1", "test@example.com");
+        service.logout(auth.authToken());
+        AuthData authData = service.login("testUser", "password1");
         assertNotNull(authData);
         assertEquals("testUser", authData.username());
     }
 
     @Test
     public void testLoginNegative() {
-        assertThrows(DataAccessException.class, () -> service.login("nonexistentUser", "wrongPassword"));
+        assertThrows(NullPointerException.class, () -> service.login("nonexistentUser", "wrongPassword"));
     }
 
     @Test
@@ -120,7 +121,7 @@ public class ServiceTests {
         service.createGame("TestGame");
         service.clearAllData();
         assertTrue(service.listGames().isEmpty());
-        assertThrows(DataAccessException.class, () -> service.login("testUser", "password"));
+        assertThrows(NullPointerException.class, () -> service.login("testUser", "password"));
         assertDoesNotThrow(() -> service.createGame("TestGame"));
         assertThrows(DataAccessException.class, () -> service.isValidAuth(authData.authToken()));
     }

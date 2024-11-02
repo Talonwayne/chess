@@ -29,7 +29,7 @@ public class MemoryUserDAO implements UserDAO{
 
     public UserData getUser(String username) throws DataAccessException{
         if(users == null || users.isEmpty()){
-            throw new DataAccessException("List Users is Empty");
+            return null;
         }
         for (UserData user : users){
             if (user.username().equals(username)){
