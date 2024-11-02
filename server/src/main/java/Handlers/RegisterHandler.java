@@ -1,8 +1,8 @@
 package handlers;
 
-import handlers.Requests.RegisterRequest;
-import handlers.Responses.ErrorResponse;
-import handlers.Responses.LoginResponse;
+import handlers.requests.RegisterRequest;
+import handlers.responses.ErrorResponse;
+import handlers.responses.LoginResponse;
 import service.Service;
 import spark.Request;
 import spark.Response;

@@ -1,8 +1,8 @@
 package handlers;
 
-import handlers.Requests.CreateGameRequest;
-import handlers.Responses.CreateGameResponse;
-import handlers.Responses.ErrorResponse;
+import handlers.requests.CreateGameRequest;
+import handlers.responses.CreateGameResponse;
+import handlers.responses.ErrorResponse;
 import service.Service;
 import spark.Request;
 import spark.Response;
@@ -28,11 +28,6 @@ public class CreateGameHandler implements Route {
         } catch (Exception e) {
             return JsonSerializer.makeSparkResponse(500, res, new ErrorResponse("Error: " + e.getMessage()));
         }
-        /*
-                catch (FileAlreadyExistsException e){
-                    return JsonSerializer.makeSparkResponse(400, res, new ErrorResponse("Error: bad request"));
-                }
-                */
     }
 }
 

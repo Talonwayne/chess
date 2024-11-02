@@ -1,7 +1,7 @@
 package handlers;
 
-import handlers.Responses.ErrorResponse;
-import handlers.Responses.ListGamesResponse;
+import handlers.responses.ErrorResponse;
+import handlers.responses.ListGamesResponse;
 import service.Service;
 import spark.Request;
 import spark.Response;

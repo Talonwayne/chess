@@ -1,3 +1,3 @@
-package handlers.Requests;
+package handlers.requests;
 
 public record RegisterRequest (String username, String password, String email){}
