@@ -61,6 +61,12 @@ public class MySqlGameDAO implements GameDAO{
     }
 
     public int createGame(String gameName) throws DataAccessException {
+        HashSet<GameData> games = listGames();
+        for (GameData game: games){
+            if (game.gameName().equals(gameName)){
+                throw new DataAccessException("gameName Already Exists");
+            }
+        }
         var statement = "INSERT INTO games (gameName) VALUES (?)";
         try {
             return helper.executeUpdate(statement, gameName); 
@@ -90,9 +96,11 @@ public class MySqlGameDAO implements GameDAO{
     }
 
     public void updateGame(int gameID, GameData updatedGame) throws DataAccessException {
-        var statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ? WHERE gameID = ?";
+        var statement = "UPDATE games SET whiteUsername = ?, blackUsername = ?, gameName = ?, ChessGameJson = ? WHERE gameID = ?";
         try {
-            helper.executeUpdate(statement, updatedGame.whiteUsername(), updatedGame.blackUsername(), updatedGame.gameName(), gameID);
+            helper.executeUpdate(statement, updatedGame.whiteUsername(),
+                    updatedGame.blackUsername(), updatedGame.gameName(),
+                    MySqlHelper.toJson(updatedGame.game()), gameID);
         } catch (DataAccessException e) {
             throw new DataAccessException("Error updating game: " + e.getMessage());
         }

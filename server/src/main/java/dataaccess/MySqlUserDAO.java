@@ -38,6 +38,9 @@ public class MySqlUserDAO implements UserDAO{
 
     public void createUser(String username, String password, String email) throws DataAccessException{
         var statement = "INSERT INTO users (username, password, email) VALUES (?,?,?)";
+        if (getUser(username) != null){
+            throw new DataAccessException("Username Already Exists");
+        }
         try {
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
             helper.executeUpdate(statement, username, hashedPassword, email);
