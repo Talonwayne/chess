@@ -3,9 +3,10 @@ package ui;
 import java.util.Scanner;
 
 public class Repl {
-    //private final chessClient client;
+    private final chessClient client;
 
     public Repl(String serverUrl){
+        client = new chessClient(serverUrl);
     }
 
     public void run(){
@@ -13,13 +14,21 @@ public class Repl {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")){
+            printPrompt();
             String input = scanner.nextLine();
             try{
+                result = client.evaluate(input);
+                System.out.print();
             } catch (Exception e ){
+                System.out.print(e.toString());
 
             }
-
         }
+        System.out.println();
+    }
+
+    private void printPrompt() {
+        System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
     }
 
 
