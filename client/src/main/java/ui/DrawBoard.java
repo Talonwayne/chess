@@ -32,31 +32,40 @@ public class DrawBoard {
 
     public void drawMargin(String[] symbols) {
         System.out.print(BG);
+        System.out.print("  ");
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         for (String symbol : symbols) {
             System.out.print(" " + symbol + " ");
         }
+        System.out.print(EscapeSequences.EMPTY);
         System.out.println();
     }
 
     public void drawRow(int row, ChessGame game) {
+        System.out.print(BG);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         System.out.print(row + " ");
         for (int col = 1; col <= NUM_SQUARES_XY; col++) {
             ChessPosition square = new ChessPosition(row, col);
             ChessPiece piece = game.getBoard().getPiece(square);
             drawSquare(square, piece);
         }
+        System.out.print(BG);
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         System.out.print(" " + row);
+        System.out.print(EscapeSequences.EMPTY);
     }
 
     public void drawSquare(ChessPosition square, ChessPiece piece) {
         String squareColor = (square.getRow() + square.getColumn()) % 2 == 0 ? WHITE_SQUARE : BLACK_SQUARE;
         System.out.print(squareColor);
-        ChessPiece.PieceType pieceType = piece.getPieceType();
-        if (piece.equals(null)) {
+        if (piece == null) {
             System.out.print(EscapeSequences.EMPTY);
             return;
         }
+        ChessPiece.PieceType pieceType = piece.getPieceType();
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
             switch (pieceType) {
                 case PAWN ->   System.out.print(EscapeSequences.WHITE_PAWN);
                 case ROOK ->   System.out.print(EscapeSequences.WHITE_ROOK);
@@ -67,6 +76,7 @@ public class DrawBoard {
                 case null, default -> System.out.print(EscapeSequences.EMPTY);
             }
         } else {
+            System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
             switch (pieceType) {
                 case PAWN ->   System.out.print(EscapeSequences.BLACK_PAWN);
                 case ROOK ->   System.out.print(EscapeSequences.BLACK_ROOK);
