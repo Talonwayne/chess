@@ -1,8 +1,8 @@
 package handlers;
 
-import handlers.requests.CreateGameRequest;
-import handlers.responses.CreateGameResponse;
-import handlers.responses.ErrorResponse;
+import model.requests.CreateGameRequest;
+import model.responses.CreateGameResponse;
+import model.responses.ErrorResponse;
 import service.Service;
 import spark.Request;
 import spark.Response;

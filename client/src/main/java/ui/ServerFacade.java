@@ -1,6 +1,8 @@
 package ui;
 
 import com.google.gson.Gson;
+import model.requests.LoginRequest;
+import model.requests.RegisterRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,18 +12,31 @@ import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.net.http.HttpConnectTimeoutException;
+import model.*;
+import model.responses.LoginResponse;
 
 public class ServerFacade {
     private final String serverUrl;
+    private static final Gson GSON = new Gson();
     public ServerFacade(String serverUrl){
         this.serverUrl = serverUrl;
     }
 
-    public String register(String username, String password, String email){
-        RegisterRequest rr = new Register
-        return this.makeRequest("POST","/user", )
+    public LoginResponse register(String username, String password, String email) throws HttpRetryException{
+        RegisterRequest rr = new RegisterRequest(username,password,email);
+        return this.makeRequest("POST","/user", rr, LoginResponse.class);
     }
+
+    public LoginResponse login(String username, String password) throws HttpRetryException{
+        LoginRequest lr = new LoginRequest(username,password);
+        return this.makeRequest("POST", "/session", lr, LoginResponse.class);
+    }
+
+    public LoginResponse login(String username, String password) throws HttpRetryException{
+        LoginRequest lr = new LoginRequest(username,password);
+        return this.makeRequest("POST", "/session", lr, LoginResponse.class);
+    }
+
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws HttpRetryException  {
         try {
@@ -43,7 +58,7 @@ public class ServerFacade {
     private static void writeBody(Object request, HttpURLConnection http) throws IOException  {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
-            String reqData = new Gson().toJson(request);
+            String reqData = GSON.toJson(request);
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());
             }
@@ -63,7 +78,7 @@ public class ServerFacade {
             try (InputStream respBody = http.getInputStream()) {
                 InputStreamReader reader = new InputStreamReader(respBody);
                 if (responseClass != null) {
-                    response = new Gson().fromJson(reader, responseClass);
+                    response = GSON.fromJson(reader, responseClass);
                 }
             }
         }

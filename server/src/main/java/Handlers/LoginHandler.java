@@ -1,8 +1,8 @@
 package handlers;
 
-import handlers.requests.LoginRequest;
-import handlers.responses.ErrorResponse;
-import handlers.responses.LoginResponse;
+import model.requests.LoginRequest;
+import model.responses.ErrorResponse;
+import model.responses.LoginResponse;
 import service.Service;
 import spark.Request;
 import spark.Response;

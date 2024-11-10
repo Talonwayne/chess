@@ -1,11 +1,13 @@
 package ui;
 
+import java.net.HttpRetryException;
 import java.util.Arrays;
 
 public class chessClient {
     private final ServerFacade server;
     private final String serverUrl;
     private boolean isLoggedIn = false;
+    private String auth;
 
     public chessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
@@ -21,7 +23,6 @@ public class chessClient {
                 case "register" -> register(params);
                 case "login" -> login(params);
                 case "quit" -> quit();
-                case "help" -> help();
                 case "create" -> create(params);
                 case "list" -> list();
                 case "join" -> join(params);
@@ -36,6 +37,13 @@ public class chessClient {
 
     public String register(String... params){
         if (params.length == 3){
+            try {
+                auth = server.register(params[0], params[1], params[2]).authToken();
+                isLoggedIn = true;
+                return this.help();
+            }catch (HttpRetryException e){
+                return e.getMessage();
+            }
 
         }
         throw new IllegalArgumentException("Expected: username password email");
