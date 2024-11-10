@@ -18,10 +18,9 @@ public class Repl {
             String input = scanner.nextLine();
             try{
                 result = client.evaluate(input);
-                System.out.print();
+                System.out.print(result);
             } catch (Exception e ){
                 System.out.print(e.toString());
-
             }
         }
         System.out.println();

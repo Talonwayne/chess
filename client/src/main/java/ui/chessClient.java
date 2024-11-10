@@ -36,7 +36,7 @@ public class chessClient {
     }
 
     public String register(String... params){
-        if (params.length == 3){
+        if (params.length >= 3){
             try {
                 auth = server.register(params[0], params[1], params[2]).authToken();
                 isLoggedIn = true;
@@ -44,19 +44,26 @@ public class chessClient {
             }catch (HttpRetryException e){
                 return e.getMessage();
             }
-
         }
         throw new IllegalArgumentException("Expected: username password email");
     }
 
     public String login(String... params){
-        if (params.length == 2){
-
+        if (params.length >= 2){
+            try {
+                auth = server.login(params[0], params[1]).authToken();
+                isLoggedIn = true;
+                return this.help();
+            }catch (HttpRetryException e){
+                return e.getMessage();
+            }
         }
         throw new IllegalArgumentException("Expected: username password");
     }
 
-    public String quit(){}
+    public String quit(){
+        return "quit";
+    }
 
     public String help(){
         if (isLoggedIn){
@@ -81,17 +88,23 @@ public class chessClient {
 
     public String create(String... params){
         assertSignedIn();
-        if (params.length == 3){
+        if (params.length >= 1){
+            try {
+                server.create(params[0]);
+                return "Game Created";
+            } catch (HttpRetryException e){
+                return e.getMessage();
+            }
 
         }
-        throw new IllegalArgumentException("Expected: username password email");
+        throw new IllegalArgumentException("Expected: gamename");
     }
 
-    public String list(String... params){
+    public String list(){
         assertSignedIn();
-        if (params.length == 3){
+        try{
 
-        }
+        }catch ()
         throw new IllegalArgumentException("Expected: username password email");
     }
 

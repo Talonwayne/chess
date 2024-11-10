@@ -1,6 +1,7 @@
 package ui;
 
 import com.google.gson.Gson;
+import model.requests.CreateGameRequest;
 import model.requests.LoginRequest;
 import model.requests.RegisterRequest;
 
@@ -13,6 +14,8 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import model.*;
+import model.responses.CreateGameResponse;
+import model.responses.ListGamesResponse;
 import model.responses.LoginResponse;
 
 public class ServerFacade {
@@ -24,7 +27,7 @@ public class ServerFacade {
 
     public LoginResponse register(String username, String password, String email) throws HttpRetryException{
         RegisterRequest rr = new RegisterRequest(username,password,email);
-        return this.makeRequest("POST","/user", rr, LoginResponse.class);
+        return this.makeRequest("POST","/user", rr, LoginResponse.class, null);
     }
 
     public LoginResponse login(String username, String password) throws HttpRetryException{
@@ -32,13 +35,28 @@ public class ServerFacade {
         return this.makeRequest("POST", "/session", lr, LoginResponse.class);
     }
 
-    public LoginResponse login(String username, String password) throws HttpRetryException{
-        LoginRequest lr = new LoginRequest(username,password);
-        return this.makeRequest("POST", "/session", lr, LoginResponse.class);
+    public CreateGameResponse create(String authToken,String gameName) throws HttpRetryException{
+        CreateGameRequest cr = new CreateGameRequest(gameName);
+        return this.makeRequest("POST", "/game", cr, CreateGameResponse.class);
+    }
+
+    public ListGamesResponse list(){
+        return this.makeRequest("GET", "/game", cr, CreateGameResponse.class);
+    }
+
+    public void join(String authToken, int ID){
+        return this.makeRequest("PUT", "/game", cr, CreateGameResponse.class);
+    }
+
+    public void observe(String authToken, int ID){
+    }
+
+    public void logout(String authToken){
+        return this.makeRequest("DELETE", "/session", cr, CreateGameResponse.class);
     }
 
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws HttpRetryException  {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws HttpRetryException  {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -46,6 +64,7 @@ public class ServerFacade {
             http.setDoOutput(true);
 
             writeBody(request, http);
+            writeHeader(authToken,http);
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
@@ -62,6 +81,12 @@ public class ServerFacade {
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());
             }
+        }
+    }
+
+    private static void writeHeader(String authToken, HttpURLConnection http) throws IOException{
+        if (authToken != null) {
+            http.addRequestProperty("Authorization", "Bearer " + authToken);
         }
     }
 
