@@ -2,6 +2,7 @@ package ui;
 
 import com.google.gson.Gson;
 import model.requests.CreateGameRequest;
+import model.requests.JoinGameRequest;
 import model.requests.LoginRequest;
 import model.requests.RegisterRequest;
 
@@ -13,7 +14,6 @@ import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import model.*;
 import model.responses.CreateGameResponse;
 import model.responses.ListGamesResponse;
 import model.responses.LoginResponse;
@@ -32,27 +32,25 @@ public class ServerFacade {
 
     public LoginResponse login(String username, String password) throws HttpRetryException{
         LoginRequest lr = new LoginRequest(username,password);
-        return this.makeRequest("POST", "/session", lr, LoginResponse.class);
+        return this.makeRequest("POST", "/session", lr, LoginResponse.class, null);
     }
 
     public CreateGameResponse create(String authToken,String gameName) throws HttpRetryException{
         CreateGameRequest cr = new CreateGameRequest(gameName);
-        return this.makeRequest("POST", "/game", cr, CreateGameResponse.class);
+        return this.makeRequest("POST", "/game", cr, CreateGameResponse.class, authToken);
     }
 
-    public ListGamesResponse list(){
-        return this.makeRequest("GET", "/game", cr, CreateGameResponse.class);
+    public ListGamesResponse list(String authToken) throws HttpRetryException{
+        return this.makeRequest("GET", "/game", null, ListGamesResponse.class, authToken);
     }
 
-    public void join(String authToken, int ID){
-        return this.makeRequest("PUT", "/game", cr, CreateGameResponse.class);
+    public void join(String authToken, int ID, String color) throws HttpRetryException{
+        JoinGameRequest jg = new JoinGameRequest(color,ID);
+        this.makeRequest("PUT", "/game", jg, CreateGameResponse.class, authToken);
     }
 
-    public void observe(String authToken, int ID){
-    }
-
-    public void logout(String authToken){
-        return this.makeRequest("DELETE", "/session", cr, CreateGameResponse.class);
+    public void logout(String authToken) throws HttpRetryException{
+        this.makeRequest("DELETE", "/session", null, CreateGameResponse.class, authToken);
     }
 
 
@@ -84,13 +82,13 @@ public class ServerFacade {
         }
     }
 
-    private static void writeHeader(String authToken, HttpURLConnection http) throws IOException{
+    private static void writeHeader(String authToken, HttpURLConnection http){
         if (authToken != null) {
             http.addRequestProperty("Authorization", "Bearer " + authToken);
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, HttpRetryException   {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException   {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
             throw new HttpRetryException("Not 200", status);

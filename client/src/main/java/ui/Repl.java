@@ -20,7 +20,7 @@ public class Repl {
                 result = client.evaluate(input);
                 System.out.print(result);
             } catch (Exception e ){
-                System.out.print(e.toString());
+                System.out.print(e.getMessage());
             }
         }
         System.out.println();

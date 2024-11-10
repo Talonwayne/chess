@@ -1,17 +1,20 @@
 package ui;
 
+import model.GameData;
+
 import java.net.HttpRetryException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 
 public class chessClient {
     private final ServerFacade server;
-    private final String serverUrl;
     private boolean isLoggedIn = false;
     private String auth;
+    private ArrayList<GameData> curGameList;
 
     public chessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
     }
 
     public String evaluate(String input){
@@ -79,7 +82,7 @@ public class chessClient {
         } else {
             return """
                     register <USERNAME> <PASSWORD> <EMAIL> - to make an account
-                    login <USERNAME> <PASSWORD> - to play 
+                    login <USERNAME> <PASSWORD> - to play
                     quit - to exit
                     help - see possible commands
                     """;
@@ -90,43 +93,75 @@ public class chessClient {
         assertSignedIn();
         if (params.length >= 1){
             try {
-                server.create(params[0]);
-                return "Game Created";
+                server.create(auth,params[0]);
+                return params[0] +" created";
             } catch (HttpRetryException e){
                 return e.getMessage();
             }
-
         }
-        throw new IllegalArgumentException("Expected: gamename");
+        throw new IllegalArgumentException("Expected: name");
     }
 
     public String list(){
         assertSignedIn();
         try{
-
-        }catch ()
-        throw new IllegalArgumentException("Expected: username password email");
+            HashSet<GameData> games = server.list(auth).games();
+            curGameList = new ArrayList<>(games);
+            StringBuilder output = new StringBuilder();
+            for (int i = 0; i < curGameList.size(); i++){
+                GameData game = curGameList.get(i);
+                output.append(i +1).append(". ").append(game.gameName()).append("- White: ").
+                        append(game.whiteUsername()).append(", Black: ").append(game.blackUsername()).append("\n");
+            }
+            return output.toString();
+        }catch (Exception e){
+            return e.getMessage();
+        }
     }
 
     public String join(String... params){
         assertSignedIn();
-        if (params.length == 3){
-
+        if (params.length >= 2){
+            try {
+                GameData game = getRealGameID(params[0]);
+                DrawBoard drawBoard = new  DrawBoard(params[1].equals("WHITE"));
+                drawBoard.drawBoard(game.game());
+                server.join(auth, game.gameID(), params[1]);
+                return "";
+            } catch (Exception e){
+                return e.getMessage();
+            }
         }
-        throw new IllegalArgumentException("Expected: username password email");
+        throw new IllegalArgumentException("Expected: ID# WHITE|BLACK");
     }
 
     public String observe(String... params){
         assertSignedIn();
-        if (params.length == 3){
-
+        if (params.length >= 1){
+            try {
+                GameData game = getRealGameID(params[0]);
+                DrawBoard showWhite = new DrawBoard(true);
+                DrawBoard showBlack = new DrawBoard(false);
+                showWhite.drawBoard(game.game());
+                showBlack.drawBoard(game.game());
+                return "";
+            } catch (Exception e){
+                return e.getMessage();
+            }
         }
-        throw new IllegalArgumentException("Expected: username password email");
+        throw new IllegalArgumentException("Expected: ID#");
     }
 
     public String logout(){
         assertSignedIn();
-        isLoggedIn = false;
+        try {
+            server.logout(auth);
+            auth = null;
+            isLoggedIn = false;
+            return "I guess you signed out";
+        } catch (HttpRetryException e){
+            return e.getMessage();
+        }
     }
 
     private void assertSignedIn() throws IllegalAccessError{
@@ -135,8 +170,10 @@ public class chessClient {
         }
     }
 
-
-
-
-
+    private GameData getRealGameID(String fakeID){
+        if (curGameList.isEmpty()){
+            throw new IllegalArgumentException("Game does not exist");
+        }
+        return curGameList.get(Integer.parseInt(fakeID));
+    }
 }
