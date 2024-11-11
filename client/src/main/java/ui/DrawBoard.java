@@ -23,11 +23,13 @@ public class DrawBoard {
     public void drawBoard(ChessGame game) {
         String[] symbols = isWhite ? new String[]{"a", "b", "c", "d", "e", "f", "g", "h"} : new String[]{"h", "g", "f", "e", "d", "c", "b", "a"};
         drawMargin(symbols);
-        for (int row = 1; row <= NUM_SQUARES_XY; row++) {
+        int[] rows = isWhite ? new int[]{8,7,6,5,4,3,2,1} : new int[]{1,2,3,4,5,6,7,8};
+        for (int row: rows) {
             drawRow(row,game);
             System.out.println();
         }
         drawMargin(symbols);
+        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
     }
 
     public void drawMargin(String[] symbols) {

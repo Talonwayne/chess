@@ -53,6 +53,10 @@ public class ServerFacade {
         this.makeRequest("DELETE", "/session", null, CreateGameResponse.class, authToken);
     }
 
+    public void clear() throws HttpRetryException{
+        this.makeRequest("DELETE", "/db", null, null, null);
+    }
+
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws HttpRetryException  {
         try {
@@ -61,8 +65,9 @@ public class ServerFacade {
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
-            writeBody(request, http);
             writeHeader(authToken,http);
+            writeBody(request, http);
+
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
@@ -84,7 +89,7 @@ public class ServerFacade {
 
     private static void writeHeader(String authToken, HttpURLConnection http){
         if (authToken != null) {
-            http.addRequestProperty("Authorization", "Bearer " + authToken);
+            http.addRequestProperty("Authorization",authToken);
         }
     }
 

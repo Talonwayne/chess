@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import model.GameData;
 
 import java.net.HttpRetryException;
@@ -123,10 +124,12 @@ public class chessClient {
         assertSignedIn();
         if (params.length >= 2){
             try {
-                GameData game = getRealGameID(params[0]);
-                DrawBoard drawBoard = new  DrawBoard(params[1].equals("WHITE"));
-                drawBoard.drawBoard(game.game());
-                server.join(auth, game.gameID(), params[1]);
+                boolean isWhite = params[1] == "WHITE";
+                GameData gameData = getRealGameID(params[0]);
+                ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
+                DrawBoard drawBoard = new  DrawBoard(isWhite);
+                drawBoard.drawBoard(game);
+                server.join(auth, gameData.gameID(), params[1]);
                 return "";
             } catch (Exception e){
                 return e.getMessage();
@@ -174,6 +177,6 @@ public class chessClient {
         if (curGameList.isEmpty()){
             throw new IllegalArgumentException("Game does not exist");
         }
-        return curGameList.get(Integer.parseInt(fakeID));
+        return curGameList.get(Integer.parseInt(fakeID)-1);
     }
 }

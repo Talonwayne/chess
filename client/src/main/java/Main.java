@@ -1,4 +1,5 @@
 import chess.*;
+import ui.DrawBoard;
 import ui.Repl;
 
 public class Main {
@@ -8,5 +9,6 @@ public class Main {
         String url = "http://localhost:8080";
         Repl repl = new Repl(url);
         repl.run();
+
     }
 }
