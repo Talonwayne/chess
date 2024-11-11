@@ -43,7 +43,7 @@ public  class MemoryGameDAO implements GameDAO{
         return gameID;
     }
 
-    public  HashSet<GameData> listGames(){
+    public  HashSet<GameData> listGames() throws DataAccessException{
         return games;
     }
 

@@ -52,7 +52,6 @@ public class Service {
             } else {
                 throw new FileAlreadyExistsException("The Black Pieces Are Taken");
             }
-
         }
     }
 
@@ -60,7 +59,7 @@ public class Service {
         return gameDAO.createGame(gameName);
     }
 
-    public HashSet<GameData> listGames() {
+    public HashSet<GameData> listGames() throws DataAccessException{
         return gameDAO.listGames();
     }
 

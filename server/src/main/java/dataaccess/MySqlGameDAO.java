@@ -67,15 +67,16 @@ public class MySqlGameDAO implements GameDAO{
                 throw new DataAccessException("gameName Already Exists");
             }
         }
-        var statement = "INSERT INTO games (gameName) VALUES (?)";
+        var statement = "INSERT INTO games (whiteUsername, blackUsername, gameName, ChessGameJson) VALUES (?, ?, ?, ?)";
+        ChessGame game = new ChessGame();
         try {
-            return helper.executeUpdate(statement, gameName); 
+            return helper.executeUpdate(statement, null, null, gameName, MySqlHelper.toJson(game));
         } catch (DataAccessException e) {
             throw new DataAccessException("Error creating game: " + e.getMessage());
         }
     }
 
-    public HashSet<GameData> listGames() {
+    public HashSet<GameData> listGames() throws DataAccessException{
         var statement = "SELECT * FROM games";
         HashSet<GameData> games = new HashSet<>();
         try {
@@ -90,7 +91,7 @@ public class MySqlGameDAO implements GameDAO{
                 ));
             }
         } catch (DataAccessException| SQLException e) {
-            System.out.println("listGames failed");
+            throw new DataAccessException("List Games Failed");
         }
         return games;
     }

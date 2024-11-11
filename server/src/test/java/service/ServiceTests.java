@@ -109,8 +109,12 @@ public class ServiceTests {
 
     @Test
     public void testListGamesNegative() {
-        HashSet<GameData> games = service.listGames();
-        assertTrue(games.isEmpty());
+        try {
+            HashSet<GameData> games = service.listGames();
+            assertTrue(games.isEmpty());
+        }catch (DataAccessException e){
+            fail();
+        }
     }
 
 

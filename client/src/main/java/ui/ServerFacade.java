@@ -35,7 +35,7 @@ public class ServerFacade {
         return this.makeRequest("POST", "/session", lr, LoginResponse.class, null);
     }
 
-    public CreateGameResponse create(String authToken,String gameName) throws HttpRetryException{
+    public CreateGameResponse create(String authToken, String gameName) throws HttpRetryException{
         CreateGameRequest cr = new CreateGameRequest(gameName);
         return this.makeRequest("POST", "/game", cr, CreateGameResponse.class, authToken);
     }
@@ -45,7 +45,7 @@ public class ServerFacade {
     }
 
     public void join(String authToken, int gameId, String color) throws HttpRetryException{
-        JoinGameRequest jg = new JoinGameRequest(color,gameId);
+        JoinGameRequest jg = new JoinGameRequest(color, gameId);
         this.makeRequest("PUT", "/game", jg, CreateGameResponse.class, authToken);
     }
 

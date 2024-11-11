@@ -99,7 +99,7 @@ public class ChessClient {
         }
         if (params.length >= 1){
             try {
-                server.create(auth,params[0]);
+                server.create(auth, params[0]);
                 return EscapeSequences.SET_TEXT_COLOR_YELLOW + params[0] + EscapeSequences.SET_TEXT_COLOR_GREEN + " created";
             } catch (HttpRetryException e){
                 throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Game Name Already Exists");
@@ -144,7 +144,7 @@ public class ChessClient {
                 GameData gameData = getRealGameID(params[0]);
                 ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
                 server.join(auth, gameData.gameID(), params[1]);
-                DrawBoard drawBoard = new  DrawBoard(isWhite);
+                DrawBoard drawBoard = new DrawBoard(isWhite);
                 drawBoard.drawBoard(game);
                 return "";
             } catch (Exception e){

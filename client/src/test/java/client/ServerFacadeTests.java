@@ -11,7 +11,9 @@ import ui.ServerFacade;
 import org.junit.jupiter.api.Test;
 
 import java.net.HttpRetryException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -160,13 +162,15 @@ public class ServerFacadeTests {
     public void posTestList() {
         try {
             LoginResponse response = testRegister();
-            CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
-            CreateGameResponse cr2 = serverFacade.create(response.authToken(),"testName2");
-            CreateGameResponse cr3 = serverFacade.create(response.authToken(),"testName3");
-            CreateGameResponse cr4 = serverFacade.create(response.authToken(),"testName4");
-            CreateGameResponse cr5 = serverFacade.create(response.authToken(),"testName5");
-            ListGamesResponse listGamesResponse = serverFacade.list(response.authToken());
-            assertEquals(listGamesResponse.games().size(), 5);
+            List<GameData> expected = new ArrayList<>();
+            for (int i = 1; i<=5;i++){
+                CreateGameResponse cr = serverFacade.create(response.authToken(), "game" + i);
+                expected.add(new GameData(cr.gameID(), null, null, "game" + i, new ChessGame()));
+            }
+            HashSet<GameData> resultGames = serverFacade.list(response.authToken()).games();
+            for (GameData example: expected){
+                assertTrue(resultGames.contains(example));
+            }
         } catch (Exception e){
             fail("List failed");
         }
@@ -189,7 +193,7 @@ public class ServerFacadeTests {
             LoginResponse response = testRegister();
             CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
-            GameData expectedGame = new GameData(cr1.gameID(),response.username(),null,"testName1", null);
+            GameData expectedGame = new GameData(cr1.gameID(),response.username(),null,"testName1", new ChessGame());
             HashSet<GameData> games = serverFacade.list(response.authToken()).games();
             boolean gameFound = false;
             for (GameData game : games) {
