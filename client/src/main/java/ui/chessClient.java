@@ -9,7 +9,7 @@ import java.util.HashSet;
 
 public class chessClient {
     private final ServerFacade server;
-    private boolean isLoggedIn = false;
+    public boolean isLoggedIn = false;
     private String auth;
     private ArrayList<GameData> curGameList;
 

@@ -10,11 +10,12 @@ public class Repl {
     }
 
     public void run(){
-        System.out.println("Welcome to 240 Chess by Talon Anderson. Type Help to get started");
+        System.out.println("Welcome to 240 Chess by Talon Anderson. Here are the possible commands" + EscapeSequences.SET_TEXT_COLOR_GREEN);
         Scanner scanner = new Scanner(System.in);
         var result = "";
+        System.out.print(client.evaluate(""));
         while (!result.equals("quit")){
-            printPrompt();
+            printPrompt(client.isLoggedIn);
             String input = scanner.nextLine();
             try{
                 result = client.evaluate(input);
@@ -26,8 +27,12 @@ public class Repl {
         System.out.println();
     }
 
-    private void printPrompt() {
-        System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + ">>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
+    private void printPrompt(Boolean isLoggedIn) {
+        if (isLoggedIn) {
+            System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[LOGGED IN] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
+        } else {
+            System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[LOGGED OUT] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
+        }
     }
 
 

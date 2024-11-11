@@ -1,7 +1,7 @@
 package client;
 
 import org.junit.jupiter.api.*;
-import server.Server;
+import server.Server
 
 
 public class ServerFacadeTests {
@@ -22,8 +22,48 @@ public class ServerFacadeTests {
 
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    public void testRegister() {
+
     }
+
+    @Test
+    public void testLogin() {
+
+    }
+
+    @Test
+    public void testQuit() {
+
+    }
+
+    @Test
+    public void testHelp() {
+
+    }
+
+    @Test
+    public void testCreate() {
+
+    }
+
+    @Test
+    public void testList() {
+
+    }
+
+    @Test
+    public void testJoin() {
+    }
+
+    @Test
+    public void testObserve() {
+
+    }
+
+    @Test
+    public void testLogout() {
+
+    }
+
 
 }
