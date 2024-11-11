@@ -8,13 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-public class chessClient {
+public class ChessClient {
     private final ServerFacade server;
     public boolean isLoggedIn = false;
     private String auth;
     private ArrayList<GameData> curGameList;
 
-    public chessClient(String serverUrl){
+    public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         curGameList = null;
     }
@@ -165,10 +165,10 @@ public class chessClient {
             try {
                 GameData gameData = getRealGameID(params[0]);
                 ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
-                DrawBoard showWhite = new DrawBoard(true);
-                DrawBoard showBlack = new DrawBoard(false);
-                showWhite.drawBoard(game);
-                showBlack.drawBoard(game);
+                DrawBoard displayBoard = new DrawBoard(true);
+                displayBoard.drawBoard(game);
+                displayBoard.setWhite(false);
+                displayBoard.drawBoard(game);
                 return "";
             } catch (Exception e){
                 throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");

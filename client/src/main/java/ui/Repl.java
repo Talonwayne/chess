@@ -3,10 +3,10 @@ package ui;
 import java.util.Scanner;
 
 public class Repl {
-    private final chessClient client;
+    private final ChessClient client;
 
     public Repl(String serverUrl){
-        client = new chessClient(serverUrl);
+        client = new ChessClient(serverUrl);
     }
 
     public void run(){
@@ -34,6 +34,4 @@ public class Repl {
             System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[LOGGED OUT] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
         }
     }
-
-
 }

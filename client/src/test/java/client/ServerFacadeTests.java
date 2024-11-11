@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.net.HttpRetryException;
 import java.util.HashSet;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,7 +43,7 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-    private LoginResponse _testRegister() {
+    private LoginResponse testRegister() {
         try {
             LoginResponse response = serverFacade.register("user", "password", "email");
             assertNotNull(response.authToken());
@@ -59,7 +58,7 @@ public class ServerFacadeTests {
     @Test
     public void posTestLogout() {
         try {
-            LoginResponse response = _testRegister();
+            LoginResponse response = testRegister();
             serverFacade.logout(response.authToken());
         } catch (Exception e){
             fail("Logout failed");
@@ -84,7 +83,7 @@ public class ServerFacadeTests {
     @Test
     public void posTestRegister() {
         try {
-            _testRegister();
+            testRegister();
         } catch (Exception e){
             fail("Register failed");
         }
@@ -93,12 +92,12 @@ public class ServerFacadeTests {
     @Test
     public void negTestRegister() {
         try {
-            _testRegister();
+            testRegister();
         } catch (Exception e){
             fail("Register failed");
         }
         try {
-            LoginResponse response = serverFacade.register("user", "password", "email");
+            testRegister();
             fail("Failed to Catch duplicate Registration");
         } catch (Exception e){
             assertTrue(true);
@@ -108,7 +107,7 @@ public class ServerFacadeTests {
     @Test
     public void posTestLogin() {
         try {
-            LoginResponse response = _testRegister();
+            LoginResponse response = testRegister();
             serverFacade.logout(response.authToken());
             LoginResponse response2 = serverFacade.login("user","password");
             assertNotNull(response2.authToken());
@@ -120,7 +119,7 @@ public class ServerFacadeTests {
     @Test
     public void negTestLogin() {
         try {
-            LoginResponse response = _testRegister();
+            LoginResponse response = testRegister();
             serverFacade.logout(response.authToken());
             LoginResponse response2 = serverFacade.login("u","p");
             fail("Failed to stop faulty logins");
@@ -132,7 +131,7 @@ public class ServerFacadeTests {
     @Test
     public void posTestCreate() {
         try {
-            LoginResponse response = _testRegister();
+            LoginResponse response = testRegister();
             CreateGameResponse cr = serverFacade.create(response.authToken(),"testName");
             assertNotNull(cr);
         } catch (Exception e){
@@ -142,7 +141,7 @@ public class ServerFacadeTests {
 
     @Test
     public void negTestCreate() {
-        LoginResponse response = _testRegister();
+        LoginResponse response = testRegister();
         try {
             CreateGameResponse cr = serverFacade.create(response.authToken(),"testName");
             assertNotNull(cr);
@@ -160,7 +159,7 @@ public class ServerFacadeTests {
     @Test
     public void posTestList() {
         try {
-            LoginResponse response = _testRegister();
+            LoginResponse response = testRegister();
             CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
             CreateGameResponse cr2 = serverFacade.create(response.authToken(),"testName2");
             CreateGameResponse cr3 = serverFacade.create(response.authToken(),"testName3");
@@ -176,7 +175,7 @@ public class ServerFacadeTests {
     @Test
     public void negTestList() {
         try {
-            LoginResponse response = _testRegister();
+            LoginResponse response = testRegister();
             ListGamesResponse listGamesResponse = serverFacade.list(response.authToken());
             assertEquals(listGamesResponse.games().size(), 0);
         } catch (Exception e){
@@ -187,7 +186,7 @@ public class ServerFacadeTests {
     @Test
     public void posTestJoin() {
         try {
-            LoginResponse response = _testRegister();
+            LoginResponse response = testRegister();
             CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
             GameData expectedGame = new GameData(cr1.gameID(),response.username(),null,"testName1", null);
@@ -205,7 +204,7 @@ public class ServerFacadeTests {
     @Test
     public void negTestJoin() {
         try {
-            LoginResponse response = _testRegister();
+            LoginResponse response = testRegister();
             CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
