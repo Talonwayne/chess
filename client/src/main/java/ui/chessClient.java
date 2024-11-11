@@ -16,6 +16,7 @@ public class chessClient {
 
     public chessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
+        curGameList = null;
     }
 
     public String evaluate(String input){
@@ -46,10 +47,10 @@ public class chessClient {
                 isLoggedIn = true;
                 return this.help();
             }catch (HttpRetryException e){
-                return e.getMessage();
+                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Username already Exists");
             }
         }
-        throw new IllegalArgumentException("Expected: username password email");
+        throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: username password email");
     }
 
     public String login(String... params){
@@ -59,22 +60,23 @@ public class chessClient {
                 isLoggedIn = true;
                 return this.help();
             }catch (HttpRetryException e){
-                return e.getMessage();
+                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid Username or password");
             }
         }
-        throw new IllegalArgumentException("Expected: username password");
+        throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: username password");
     }
 
     public String quit(){
-        return "quit";
+        return EscapeSequences.SET_TEXT_COLOR_YELLOW + "Thanks for Playing";
     }
 
     public String help(){
         if (isLoggedIn){
             return """
+                    Valid Inputs
                     create <NAME> - make a game
                     list - show all games
-                    join <ID> [WHITE|BLACK] - join a game a color
+                    join <ID> [WHITE|BLACK] - join a game and pick your color
                     observe <ID> - observe a game
                     logout - exit the game
                     quit - to exit
@@ -82,6 +84,7 @@ public class chessClient {
                     """;
         } else {
             return """
+                    Valid Inputs
                     register <USERNAME> <PASSWORD> <EMAIL> - to make an account
                     login <USERNAME> <PASSWORD> - to play
                     quit - to exit
@@ -91,20 +94,24 @@ public class chessClient {
     }
 
     public String create(String... params){
-        assertSignedIn();
+        if(!isLoggedIn){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to sign in first");
+        }
         if (params.length >= 1){
             try {
                 server.create(auth,params[0]);
-                return params[0] +" created";
+                return EscapeSequences.SET_TEXT_COLOR_YELLOW + params[0] + EscapeSequences.SET_TEXT_COLOR_GREEN + " created";
             } catch (HttpRetryException e){
-                return e.getMessage();
+                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Game Name Already Exists");
             }
         }
-        throw new IllegalArgumentException("Expected: name");
+        throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: name");
     }
 
     public String list(){
-        assertSignedIn();
+        if(!isLoggedIn){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to sign in first");
+        }
         try{
             HashSet<GameData> games = server.list(auth).games();
             curGameList = new ArrayList<>(games);
@@ -116,60 +123,71 @@ public class chessClient {
             }
             return output.toString();
         }catch (Exception e){
-            return e.getMessage();
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Likely Connection Error");
         }
     }
 
     public String join(String... params){
-        assertSignedIn();
+        if(!isLoggedIn){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to sign in first");
+        }
+        if (curGameList == null){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You need to list the games first, type list");
+        }
         if (params.length >= 2){
+            String color = params[1].toUpperCase();
+            if (!color.equals("WHITE") && !color.equals("BLACK")) {
+                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected color: WHITE or BLACK");
+            }
             try {
-                boolean isWhite = params[1] == "WHITE";
+                boolean isWhite = color.equals("WHITE");
                 GameData gameData = getRealGameID(params[0]);
                 ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
+                server.join(auth, gameData.gameID(), params[1]);
                 DrawBoard drawBoard = new  DrawBoard(isWhite);
                 drawBoard.drawBoard(game);
-                server.join(auth, gameData.gameID(), params[1]);
                 return "";
             } catch (Exception e){
-                return e.getMessage();
+                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
             }
         }
-        throw new IllegalArgumentException("Expected: ID# WHITE|BLACK");
+        throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: ID# WHITE|BLACK");
     }
 
     public String observe(String... params){
-        assertSignedIn();
+        if (curGameList == null){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You need to list the games first, type list");
+        }
+        if(!isLoggedIn){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to sign in first");
+        }
         if (params.length >= 1){
             try {
-                GameData game = getRealGameID(params[0]);
+                GameData gameData = getRealGameID(params[0]);
+                ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
                 DrawBoard showWhite = new DrawBoard(true);
                 DrawBoard showBlack = new DrawBoard(false);
-                showWhite.drawBoard(game.game());
-                showBlack.drawBoard(game.game());
+                showWhite.drawBoard(game);
+                showBlack.drawBoard(game);
                 return "";
             } catch (Exception e){
-                return e.getMessage();
+                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
             }
         }
-        throw new IllegalArgumentException("Expected: ID#");
+        throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: ID#");
     }
 
     public String logout(){
-        assertSignedIn();
+        if(!isLoggedIn){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to sign in first");
+        }
         try {
             server.logout(auth);
             auth = null;
             isLoggedIn = false;
-            return "I guess you signed out";
+            return EscapeSequences.SET_TEXT_COLOR_YELLOW + "You are logged out";
         } catch (HttpRetryException e){
-            return e.getMessage();
-        }
-    }
-
-    private void assertSignedIn() throws IllegalAccessError{
-        if(!isLoggedIn){
-            throw new IllegalAccessError("You got to sign in first");
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to sign in first");
         }
     }
 

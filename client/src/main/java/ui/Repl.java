@@ -14,7 +14,7 @@ public class Repl {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         System.out.print(client.evaluate(""));
-        while (!result.equals("quit")){
+        while (!result.equals(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Thanks for Playing")){
             printPrompt(client.isLoggedIn);
             String input = scanner.nextLine();
             try{

@@ -1,5 +1,7 @@
 package client;
 
+import chess.ChessGame;
+import model.GameData;
 import model.responses.CreateGameResponse;
 import model.responses.ListGamesResponse;
 import model.responses.LoginResponse;
@@ -9,6 +11,8 @@ import ui.ServerFacade;
 import org.junit.jupiter.api.Test;
 
 import java.net.HttpRetryException;
+import java.util.HashSet;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,7 +57,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogout() {
+    public void posTestLogout() {
         try {
             LoginResponse response = _testRegister();
             serverFacade.logout(response.authToken());
@@ -68,7 +72,17 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testRegister() {
+    public void negTestLogout() {
+        try {
+            serverFacade.logout(null);
+            fail("Did not throw an error when one was expected");
+        } catch (Exception e){
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void posTestRegister() {
         try {
             _testRegister();
         } catch (Exception e){
@@ -77,7 +91,22 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testLogin() {
+    public void negTestRegister() {
+        try {
+            _testRegister();
+        } catch (Exception e){
+            fail("Register failed");
+        }
+        try {
+            _testRegister();
+            fail("Failed to Catch duplicate Registration");
+        } catch (Exception e){
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void posTestLogin() {
         try {
             LoginResponse response = _testRegister();
             serverFacade.logout(response.authToken());
@@ -89,7 +118,19 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testCreate() {
+    public void negTestLogin() {
+        try {
+            LoginResponse response = _testRegister();
+            serverFacade.logout(response.authToken());
+            LoginResponse response2 = serverFacade.login("u","p");
+            fail("Failed to stop faulty logins");
+        } catch (Exception e){
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void posTestCreate() {
         try {
             LoginResponse response = _testRegister();
             CreateGameResponse cr = serverFacade.create(response.authToken(),"testName");
@@ -100,7 +141,24 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testList() {
+    public void negTestCreate() {
+        LoginResponse response = _testRegister();
+        try {
+            CreateGameResponse cr = serverFacade.create(response.authToken(),"testName");
+            assertNotNull(cr);
+        } catch (Exception e){
+            fail("Create failed");
+        }
+        try {
+            CreateGameResponse cr = serverFacade.create(response.authToken(),"testName");
+            fail("Create worked on duplicate names");
+        } catch (Exception e){
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void posTestList() {
         try {
             LoginResponse response = _testRegister();
             CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
@@ -116,13 +174,44 @@ public class ServerFacadeTests {
     }
 
     @Test
-    public void testJoin() {
+    public void negTestList() {
+        try {
+            LoginResponse response = _testRegister();
+            ListGamesResponse listGamesResponse = serverFacade.list(response.authToken());
+            assertEquals(listGamesResponse.games().size(), 0);
+        } catch (Exception e){
+            fail("List failed");
+        }
+    }
+
+    @Test
+    public void posTestJoin() {
         try {
             LoginResponse response = _testRegister();
             CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
+            GameData expectedGame = new GameData(cr1.gameID(),response.username(),null,"testName1", null);
+            HashSet<GameData> games = serverFacade.list(response.authToken()).games();
+            boolean gameFound = false;
+            for (GameData game : games) {
+                 gameFound = game.equals(expectedGame);
+            }
+            assertTrue(gameFound);
         } catch (Exception e){
             fail("Join failed");
+        }
+    }
+
+    @Test
+    public void negTestJoin() {
+        try {
+            LoginResponse response = _testRegister();
+            CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
+            serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
+            serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
+            fail("Join failed");
+        } catch (Exception e){
+
         }
     }
 }
