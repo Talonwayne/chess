@@ -29,7 +29,7 @@ public class DrawBoard {
             System.out.println();
         }
         drawMargin(symbols);
-        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK);
+        System.out.print(EscapeSequences.RESET_BG_COLOR);
     }
 
     public void drawMargin(String[] symbols) {

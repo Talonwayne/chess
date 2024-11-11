@@ -134,47 +134,65 @@ public class ChessClient {
         if (curGameList == null){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You need to list the games first, type list");
         }
-        if (params.length >= 2){
-            String color = params[1].toUpperCase();
-            if (!color.equals("WHITE") && !color.equals("BLACK")) {
-                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected color: WHITE or BLACK");
-            }
-            try {
-                boolean isWhite = color.equals("WHITE");
-                GameData gameData = getRealGameID(params[0]);
-                ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
-                server.join(auth, gameData.gameID(), params[1]);
-                DrawBoard drawBoard = new DrawBoard(isWhite);
-                drawBoard.drawBoard(game);
-                return "";
-            } catch (Exception e){
-                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
-            }
+        if (curGameList.isEmpty()){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Make a Game First");
         }
-        throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: ID# WHITE|BLACK");
+        if (params.length < 2) {
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: ID# WHITE|BLACK");
+        }
+
+        String color = params[1].toUpperCase();
+        if (!color.equals("WHITE") && !color.equals("BLACK")) {
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected color: WHITE or BLACK");
+        }
+
+        int realIndex = getRealGameID(params[0]);
+        if (realIndex >= curGameList.size()){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
+        }
+
+        GameData gameData = curGameList.get(realIndex);
+        try {
+            server.join(auth, gameData.gameID(), color);
+        } catch (HttpRetryException e) {
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That color is already taken");
+        }
+        boolean isWhite = color.equals("WHITE");
+        DrawBoard drawBoard = new DrawBoard(isWhite);
+        ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
+        drawBoard.drawBoard(game);
+        return "";
     }
 
     public String observe(String... params){
         if (curGameList == null){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You need to list the games first, type list");
         }
+        if (curGameList.isEmpty()){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Make a Game First");
+        }
         if(!isLoggedIn){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to sign in first");
         }
-        if (params.length >= 1){
-            try {
-                GameData gameData = getRealGameID(params[0]);
-                ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
-                DrawBoard displayBoard = new DrawBoard(true);
-                displayBoard.drawBoard(game);
-                displayBoard.setWhite(false);
-                displayBoard.drawBoard(game);
-                return "";
-            } catch (Exception e){
-                throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
-            }
+        if (params.length < 1) {
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: ID#");
         }
-        throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: ID#");
+
+        int realIndex = getRealGameID(params[0]);
+        if (realIndex >= curGameList.size()){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
+        }
+        try {
+            GameData gameData = curGameList.get(realIndex);
+            ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
+            DrawBoard displayBoard = new DrawBoard(true);
+            displayBoard.drawBoard(game);
+            displayBoard.setWhite(false);
+            displayBoard.drawBoard(game);
+            return "";
+        } catch (Exception e){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
+        }
     }
 
     public String logout(){
@@ -191,10 +209,7 @@ public class ChessClient {
         }
     }
 
-    private GameData getRealGameID(String fakeID){
-        if (curGameList.isEmpty()){
-            throw new IllegalArgumentException("Game does not exist");
-        }
-        return curGameList.get(Integer.parseInt(fakeID)-1);
+    private int getRealGameID(String fakeID){
+        return Integer.parseInt(fakeID) - 1;
     }
 }
