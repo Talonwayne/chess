@@ -5,7 +5,6 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 
 public class DrawBoard {
-    private static final int NUM_SQUARES_XY = 8;
     private static final String BG = EscapeSequences.SET_BG_COLOR_WHITE;
     private static final String BLACK_SQUARE = EscapeSequences.SET_BG_COLOR_DARK_GREY;
     private static final String WHITE_SQUARE = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
@@ -47,7 +46,8 @@ public class DrawBoard {
         System.out.print(BG);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         System.out.print(row + " ");
-        for (int col = 1; col <= NUM_SQUARES_XY; col++) {
+        int[] cols = isWhite ? new int[]{1,2,3,4,5,6,7,8} : new int[]{8,7,6,5,4,3,2,1};
+        for (int col: cols) {
             ChessPosition square = new ChessPosition(row, col);
             ChessPiece piece = game.getBoard().getPiece(square);
             drawSquare(square, piece);
@@ -59,7 +59,7 @@ public class DrawBoard {
     }
 
     public void drawSquare(ChessPosition square, ChessPiece piece) {
-        String squareColor = (square.getRow() + square.getColumn()) % 2 == 0 ? WHITE_SQUARE : BLACK_SQUARE;
+        String squareColor = (square.getRow() + square.getColumn()) % 2 == 0 ? BLACK_SQUARE : WHITE_SQUARE;
         System.out.print(squareColor);
         if (piece == null) {
             System.out.print(EscapeSequences.EMPTY);
