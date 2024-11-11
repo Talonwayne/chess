@@ -98,7 +98,7 @@ public class ServerFacadeTests {
             fail("Register failed");
         }
         try {
-            _testRegister();
+            LoginResponse response = serverFacade.register("user", "password", "email");
             fail("Failed to Catch duplicate Registration");
         } catch (Exception e){
             assertTrue(true);
@@ -209,9 +209,9 @@ public class ServerFacadeTests {
             CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
-            fail("Join failed");
+            fail("Join failed to catch duplicate White Joins");
         } catch (Exception e){
-
+            assertTrue(true);
         }
     }
 }
