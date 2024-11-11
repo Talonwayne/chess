@@ -92,12 +92,12 @@ public class ServerFacadeTests {
     @Test
     public void negTestRegister() {
         try {
-            testRegister();
+            LoginResponse response = serverFacade.register("user", "password", "email");
         } catch (Exception e){
             fail("Register failed");
         }
         try {
-            testRegister();
+            LoginResponse response = serverFacade.register("user", "password", "email");
             fail("Failed to Catch duplicate Registration");
         } catch (Exception e){
             assertTrue(true);
@@ -209,6 +209,34 @@ public class ServerFacadeTests {
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
             serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
             fail("Join failed to catch duplicate White Joins");
+        } catch (Exception e){
+            assertTrue(true);
+        }
+    }
+
+    @Test
+    public void posTestClear() {
+        try {
+            LoginResponse response = testRegister();
+            HashSet<GameData> before = serverFacade.list(response.authToken()).games();
+            CreateGameResponse cr1 = serverFacade.create(response.authToken(),"testName1");
+            serverFacade.join(response.authToken(),cr1.gameID(),"WHITE");
+            serverFacade.clear();
+            LoginResponse response2 = testRegister();
+            HashSet<GameData> after = serverFacade.list(response2.authToken()).games();
+            assertEquals(before,after);
+        } catch (Exception e){
+            fail("Clear failed");
+        }
+    }
+
+    @Test
+    public void negTestClear() {
+        try {
+            LoginResponse response = testRegister();
+            serverFacade.clear();
+            serverFacade.list(response.authToken());
+            fail("That authToken should Fail");
         } catch (Exception e){
             assertTrue(true);
         }
