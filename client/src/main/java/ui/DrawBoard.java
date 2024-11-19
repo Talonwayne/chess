@@ -1,15 +1,18 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.Collection;
+import java.util.List;
+
 public class DrawBoard {
-    private static final String BG = EscapeSequences.SET_BG_COLOR_WHITE;
-    private static final String BLACK_SQUARE = EscapeSequences.SET_BG_COLOR_DARK_GREY;
-    private static final String WHITE_SQUARE = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
 
     private boolean isWhite;
+    private boolean isHighlight = false;
+    private List<ChessPosition> highlights;
 
     public DrawBoard(boolean isWhite) {
         this.isWhite = isWhite;
@@ -31,8 +34,8 @@ public class DrawBoard {
         System.out.print(EscapeSequences.RESET_BG_COLOR);
     }
 
-    public void drawMargin(String[] symbols) {
-        System.out.print(BG);
+    private void drawMargin(String[] symbols) {
+        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
         System.out.print("  ");
         System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         for (String symbol : symbols) {
@@ -42,8 +45,8 @@ public class DrawBoard {
         System.out.println();
     }
 
-    public void drawRow(int row, ChessGame game) {
-        System.out.print(BG);
+    private void drawRow(int row, ChessGame game) {
+        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         System.out.print(row + " ");
         int[] cols = isWhite ? new int[]{1,2,3,4,5,6,7,8} : new int[]{8,7,6,5,4,3,2,1};
@@ -52,19 +55,28 @@ public class DrawBoard {
             ChessPiece piece = game.getBoard().getPiece(square);
             drawSquare(square, piece);
         }
-        System.out.print(BG);
+        System.out.print(EscapeSequences.SET_BG_COLOR_WHITE);
         System.out.print(EscapeSequences.SET_TEXT_COLOR_BLACK);
         System.out.print(" " + row);
         System.out.print(EscapeSequences.EMPTY);
     }
 
-    public void drawSquare(ChessPosition square, ChessPiece piece) {
-        String squareColor = (square.getRow() + square.getColumn()) % 2 == 0 ? BLACK_SQUARE : WHITE_SQUARE;
-        System.out.print(squareColor);
+    private void drawSquare(ChessPosition square, ChessPiece piece) {
+        String squareColor = (square.getRow() + square.getColumn()) % 2 == 0 ? EscapeSequences.SET_BG_COLOR_DARK_GREY : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+        if (isHighlight){
+            if(highlights.contains(square)){
+                System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW);
+            } else {
+                System.out.print(squareColor);
+            }
+        } else {
+            System.out.print(squareColor);
+        }
         if (piece == null) {
             System.out.print(EscapeSequences.EMPTY);
             return;
         }
+
         ChessPiece.PieceType pieceType = piece.getPieceType();
         if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
             System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE);
@@ -90,5 +102,17 @@ public class DrawBoard {
             }
         }
         System.out.print(EscapeSequences.RESET_BG_COLOR);
+    }
+
+    public void displayPossibleMoves(ChessGame game,ChessPosition position){
+        isHighlight = true;
+        ChessPiece piece = game.getBoard().getPiece(position);
+        Collection<ChessMove> moves = piece.pieceMoves(game.getBoard(),position);
+        highlights.clear();
+        for (ChessMove move: moves){
+            highlights.add(move.getEndPosition());
+        }
+        drawBoard(game);
+        isHighlight = false;
     }
 }

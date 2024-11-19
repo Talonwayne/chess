@@ -1,6 +1,7 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessPosition;
 import model.GameData;
 
 import java.net.HttpRetryException;
@@ -12,6 +13,7 @@ public class ChessClient {
     private final ServerFacade server;
     public boolean isLoggedIn = false;
     public boolean isInGame = false;
+    public boolean isObserving = false;
     private String auth;
     private ArrayList<GameData> curGameList;
 
@@ -34,6 +36,11 @@ public class ChessClient {
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "logout" -> logout();
+                case "1" -> highlightMoves(params);
+                case "2" -> makeMove(params);
+                case "3" -> redrawBoard();
+                case "4" -> leave();
+                case "5" -> resign();
                 default -> help();
             };
         } catch (Exception e){
@@ -72,7 +79,17 @@ public class ChessClient {
     }
 
     public String help(){
-        if (isLoggedIn){
+        if(isInGame){
+            return """
+                    Valid Inputs
+                    1 [position of the piece] - Highlight the possible moves of a piece (write the letter first like a4)
+                    2 [start position] [end position] - Make a move (write the letter first like a4)
+                    3 - Redraw the Chessboard
+                    4 - Leave the game
+                    5 - Resign the game
+                    help - see possible commands
+                    """;
+        } else if (isLoggedIn){
             return """
                     Valid Inputs
                     create <NAME> - make a game
@@ -186,10 +203,9 @@ public class ChessClient {
         try {
             GameData gameData = curGameList.get(realIndex);
             ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
-            DrawBoard displayBoard = new DrawBoard(true);
-            displayBoard.drawBoard(game);
-            displayBoard.setWhite(false);
-            displayBoard.drawBoard(game);
+            displayBoardObserver(game);
+            isObserving = true;
+            isInGame = true;
             return "";
         } catch (Exception e){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
@@ -212,5 +228,61 @@ public class ChessClient {
 
     private int getRealGameID(String fakeID){
         return Integer.parseInt(fakeID) - 1;
+    }
+
+    private void displayBoardObserver(ChessGame game){
+        DrawBoard displayBoard = new DrawBoard(false);
+        displayBoard.drawBoard(game);
+        displayBoard.setWhite(true);
+        displayBoard.drawBoard(game);
+    }
+
+
+    public String redrawBoard(){
+
+        return "";
+    }
+
+    public String leave(){
+
+        return "";
+    }
+
+    public String makeMove(String ... params){
+        if (params.length < 1) {
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: StartPosition EndPosition(Ex. a4)");
+        }
+
+        return "";
+    }
+
+    public String resign(){
+
+        return "";
+    }
+
+    public String highlightMoves(String ... params){
+        if (params.length < 1 || params[0].length() < 2) {
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: Position (Ex. a4)");
+        }
+        String input = params[0];
+        int col;
+        switch (input. (0)){
+            case "a" -> col = 1;
+            case "b" -> col = 2;
+            case "c" -> col = 3;
+            case "d" -> col = 4;
+            case "e" -> col = 5;
+            case "f" -> col = 6;
+            case "g" -> col = 7;
+            case "h" -> col = 8;
+            case null, default -> throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: Position (Ex. a4)");
+        }
+
+        int row = input.charAt(1);
+        ChessPosition pos = new ChessPosition(row,col);
+
+
+        return "";
     }
 }
