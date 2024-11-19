@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
 
@@ -8,12 +10,15 @@ import java.net.HttpRetryException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Scanner;
 
 public class ChessClient {
     private final ServerFacade server;
     public boolean isLoggedIn = false;
     public boolean isInGame = false;
     public boolean isObserving = false;
+    public boolean isWhite;
+    private DrawBoard display;
     private String auth;
     private ArrayList<GameData> curGameList;
 
@@ -83,7 +88,7 @@ public class ChessClient {
             return """
                     Valid Inputs
                     1 [position of the piece] - Highlight the possible moves of a piece (write the letter first like a4)
-                    2 [start position] [end position] - Make a move (write the letter first like a4)
+                    2 [start position] [end position] [ |QUEEN|BISHOP|KNIGHT|ROOK]"- Make a move (write the letter first like a4)
                     3 - Redraw the Chessboard
                     4 - Leave the game
                     5 - Resign the game
@@ -175,10 +180,10 @@ public class ChessClient {
         } catch (HttpRetryException e) {
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That color is already taken");
         }
-        boolean isWhite = color.equals("WHITE");
-        DrawBoard drawBoard = new DrawBoard(isWhite);
+        isWhite = color.equals("WHITE");
+        display = new DrawBoard(isWhite);
         ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
-        drawBoard.drawBoard(game);
+        display.drawBoard(game);
         return "";
     }
 
@@ -231,58 +236,98 @@ public class ChessClient {
     }
 
     private void displayBoardObserver(ChessGame game){
-        DrawBoard displayBoard = new DrawBoard(false);
-        displayBoard.drawBoard(game);
-        displayBoard.setWhite(true);
-        displayBoard.drawBoard(game);
+
+        display.drawBoard(game);
+        display.setWhite(true);
+        display.drawBoard(game);
     }
 
 
     public String redrawBoard(){
+        if (!isInGame){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
+        }
 
         return "";
     }
 
     public String leave(){
-
-        return "";
+        if (!isInGame){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
+        }
+        isInGame = false;
+        return help();
     }
 
     public String makeMove(String ... params){
-        if (params.length < 1) {
-            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: StartPosition EndPosition(Ex. a4)");
+        if (!isInGame){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
+        }
+        if (params.length < 2) {
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: StartPosition[a4] EndPosition[a5] PromotionType[ |QUEEN|BISHOP|KNIGHT|ROOK]");
         }
 
+        String start = params[0];
+        String end = params[1];
+        ChessPiece.PieceType promo = null;
+        if (params.length > 2){
+            String type = params[2].toUpperCase();
+            switch (type){
+                case "QUEEN" -> promo = ChessPiece.PieceType.QUEEN;
+                case "ROOK" -> promo = ChessPiece.PieceType.ROOK;
+                case "BISHOP" -> promo = ChessPiece.PieceType.BISHOP;
+                case "KNIGHT" -> promo = ChessPiece.PieceType.KNIGHT;
+                default -> throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: StartPosition[a4] EndPosition[a5] PromotionType[ |QUEEN|BISHOP|KNIGHT|ROOK]");
+            }
+        }
+
+        ChessMove move = new ChessMove(readPosition(start),readPosition(end),promo);
+        //Websocket here plz
         return "";
     }
 
     public String resign(){
+        if (!isInGame){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
+        }
+        System.out.print("Are you Sure you want to Resign? [yes] | [no]");
+        Scanner scanner = new Scanner(System.in);
+        if (scanner.nextLine().equals("yes")){
+            //Websocket here plz
+        }
 
         return "";
     }
 
     public String highlightMoves(String ... params){
+        if (!isInGame){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
+        }
         if (params.length < 1 || params[0].length() < 2) {
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: Position (Ex. a4)");
         }
-        String input = params[0];
-        int col;
-        switch (input. (0)){
-            case "a" -> col = 1;
-            case "b" -> col = 2;
-            case "c" -> col = 3;
-            case "d" -> col = 4;
-            case "e" -> col = 5;
-            case "f" -> col = 6;
-            case "g" -> col = 7;
-            case "h" -> col = 8;
-            case null, default -> throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: Position (Ex. a4)");
-        }
 
-        int row = input.charAt(1);
-        ChessPosition pos = new ChessPosition(row,col);
+        ChessPosition pos =  readPosition(params[0]);
+
 
 
         return "";
+    }
+
+    private ChessPosition readPosition(String input){
+        int col;
+        switch (input.charAt(0)){
+            case 'a' -> col = 1;
+            case 'b' -> col = 2;
+            case 'c' -> col = 3;
+            case 'd' -> col = 4;
+            case 'e' -> col = 5;
+            case 'f' -> col = 6;
+            case 'g' -> col = 7;
+            case 'h' -> col = 8;
+            default -> throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: Position (Example: a4)");
+        }
+        int row = input.charAt(1);
+        return new ChessPosition(row,col);
     }
 }

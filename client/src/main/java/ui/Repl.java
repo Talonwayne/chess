@@ -15,7 +15,7 @@ public class Repl {
         var result = "";
         System.out.print(client.evaluate(""));
         while (!result.equals(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Thanks for Playing")){
-            printPrompt(client.isLoggedIn);
+            printPrompt(client.isInGame, client.isLoggedIn);
             String input = scanner.nextLine();
             try{
                 result = client.evaluate(input);
@@ -27,8 +27,10 @@ public class Repl {
         System.out.println();
     }
 
-    private void printPrompt(Boolean isLoggedIn) {
-        if (isLoggedIn) {
+    private void printPrompt(Boolean isInGame,Boolean isLoggedIn) {
+        if (isInGame){
+            System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[IN GAME] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
+        } else if (isLoggedIn){
             System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[LOGGED IN] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
         } else {
             System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[LOGGED OUT] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
