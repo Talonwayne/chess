@@ -5,6 +5,7 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -111,11 +112,15 @@ public class DrawBoard {
     public void displayPossibleMoves(ChessPosition position){
         isHighlight = true;
         ChessPiece piece = game.getBoard().getPiece(position);
-        Collection<ChessMove> moves = piece.pieceMoves(game.getBoard(),position);
-        highlights.clear();
-        for (ChessMove move: moves){
-            highlights.add(move.getEndPosition());
+        if (piece == null) {
+            throw new IllegalArgumentException("No piece found at the given position.");
         }
+        Collection<ChessMove> moves = piece.pieceMoves(game.getBoard(),position);
+        List<ChessPosition> newHighlights = new ArrayList<>();
+        for (ChessMove move: moves){
+            newHighlights.add(move.getEndPosition());
+        }
+        highlights = newHighlights;
         drawBoard(game);
         isHighlight = false;
     }

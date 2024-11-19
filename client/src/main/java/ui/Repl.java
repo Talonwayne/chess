@@ -1,8 +1,12 @@
 package ui;
 
+import websocket.NotificationHandler;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
+
 import java.util.Scanner;
 
-public class Repl {
+public class Repl implements NotificationHandler {
     private final ChessClient client;
 
     public Repl(String serverUrl){
@@ -35,5 +39,10 @@ public class Repl {
         } else {
             System.out.print("\n" + EscapeSequences.RESET_TEXT_COLOR + "[LOGGED OUT] >>> " + EscapeSequences.SET_TEXT_COLOR_GREEN);
         }
+    }
+
+    public void notify(ServerMessage notification) {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + notification.message());
+        printPrompt();
     }
 }

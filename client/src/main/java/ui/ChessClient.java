@@ -5,6 +5,7 @@ import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
+import websocket.WebSocketFacade;
 
 import java.net.HttpRetryException;
 import java.util.ArrayList;
@@ -21,10 +22,12 @@ public class ChessClient {
     private DrawBoard display;
     private String auth;
     private ArrayList<GameData> curGameList;
+    private WebSocketFacade webSocket;
 
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         curGameList = null;
+        webSocket = new WebSocketFacade(serverUrl);
     }
 
     public String evaluate(String input){
@@ -312,7 +315,12 @@ public class ChessClient {
     }
 
     private ChessPosition readPosition(String input){
+        if (input.length() != 2) {
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Invalid input! Expected a position like 'a4'.");
+        }
         int col;
+
         switch (input.charAt(0)){
             case 'a' -> col = 1;
             case 'b' -> col = 2;
@@ -322,9 +330,14 @@ public class ChessClient {
             case 'f' -> col = 6;
             case 'g' -> col = 7;
             case 'h' -> col = 8;
-            default -> throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: Position (Example: a4)");
+            default -> throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Invalid row! Expected a letter a-c");
         }
-        int row = input.charAt(1);
+        int row = input.charAt(1) - '0';
+        if (row < 1 || row > 8) {
+            throw new IllegalArgumentException(
+                    "Invalid row! Expected a number between 1 and 8."
+            );
+        }
         return new ChessPosition(row,col);
     }
 }
