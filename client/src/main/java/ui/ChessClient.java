@@ -17,7 +17,7 @@ public class ChessClient {
     public boolean isLoggedIn = false;
     public boolean isInGame = false;
     public boolean isObserving = false;
-    public boolean isWhite;
+    private ChessGame curGame;
     private DrawBoard display;
     private String auth;
     private ArrayList<GameData> curGameList;
@@ -180,11 +180,11 @@ public class ChessClient {
         } catch (HttpRetryException e) {
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That color is already taken");
         }
-        isWhite = color.equals("WHITE");
+        boolean isWhite = color.equals("WHITE");
         display = new DrawBoard(isWhite);
-        ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
-        display.drawBoard(game);
-        return "";
+        curGame = gameData.game() != null ? gameData.game() : new ChessGame();
+        isInGame = true;
+        return redrawBoard();
     }
 
     public String observe(String... params){
@@ -207,11 +207,10 @@ public class ChessClient {
         }
         try {
             GameData gameData = curGameList.get(realIndex);
-            ChessGame game = gameData.game() != null ? gameData.game() : new ChessGame();
-            displayBoardObserver(game);
+            curGame = gameData.game() != null ? gameData.game() : new ChessGame();
             isObserving = true;
             isInGame = true;
-            return "";
+            return redrawBoard();
         } catch (Exception e){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
         }
@@ -235,19 +234,18 @@ public class ChessClient {
         return Integer.parseInt(fakeID) - 1;
     }
 
-    private void displayBoardObserver(ChessGame game){
-
-        display.drawBoard(game);
-        display.setWhite(true);
-        display.drawBoard(game);
-    }
-
 
     public String redrawBoard(){
         if (!isInGame){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
         }
-
+        if (isObserving){
+            display.drawBoard(curGame);
+            display.setWhite(true);
+            display.drawBoard(curGame);
+        } else {
+            display.drawBoard(curGame);
+        }
         return "";
     }
 
@@ -255,6 +253,7 @@ public class ChessClient {
         if (!isInGame){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
         }
+        //Websocket here plz
         isInGame = false;
         return help();
     }
@@ -308,9 +307,7 @@ public class ChessClient {
         }
 
         ChessPosition pos =  readPosition(params[0]);
-
-
-
+        display.displayPossibleMoves(pos);
         return "";
     }
 

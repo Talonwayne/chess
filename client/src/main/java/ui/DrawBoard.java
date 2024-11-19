@@ -12,6 +12,7 @@ public class DrawBoard {
 
     private boolean isWhite;
     private boolean isHighlight = false;
+    private ChessGame game;
     private List<ChessPosition> highlights;
 
     public DrawBoard(boolean isWhite) {
@@ -22,7 +23,10 @@ public class DrawBoard {
         isWhite = isViewColorWhite;
     }
 
+    public void setGame(ChessGame game){this.game = game;}
+
     public void drawBoard(ChessGame game) {
+        this.game = game;
         String[] symbols = isWhite ? new String[]{"a", "b", "c", "d", "e", "f", "g", "h"} : new String[]{"h", "g", "f", "e", "d", "c", "b", "a"};
         drawMargin(symbols);
         int[] rows = isWhite ? new int[]{8,7,6,5,4,3,2,1} : new int[]{1,2,3,4,5,6,7,8};
@@ -104,7 +108,7 @@ public class DrawBoard {
         System.out.print(EscapeSequences.RESET_BG_COLOR);
     }
 
-    public void displayPossibleMoves(ChessGame game,ChessPosition position){
+    public void displayPossibleMoves(ChessPosition position){
         isHighlight = true;
         ChessPiece piece = game.getBoard().getPiece(position);
         Collection<ChessMove> moves = piece.pieceMoves(game.getBoard(),position);
