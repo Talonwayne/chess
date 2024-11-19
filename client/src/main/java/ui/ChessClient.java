@@ -11,6 +11,7 @@ import java.util.HashSet;
 public class ChessClient {
     private final ServerFacade server;
     public boolean isLoggedIn = false;
+    public boolean isInGame = false;
     private String auth;
     private ArrayList<GameData> curGameList;
 
