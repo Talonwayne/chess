@@ -20,12 +20,14 @@ public class ChessGame implements Cloneable{
     private boolean blackCastleQueenside =true;
     private boolean blackCastleKingside = true;
     public ChessMove enpassantable;
+    public boolean isGameOver;
 
 
     public ChessGame() {
         this.curBoard = new ChessBoard();
         curBoard.resetBoard();
         curTeam = TeamColor.WHITE;
+        this.isGameOver = false;
 
     }
     /**
@@ -236,7 +238,7 @@ public class ChessGame implements Cloneable{
         }
         return vMoves;
     }
-    public void doMove(ChessMove move) {
+    private void doMove(ChessMove move) {
         ChessPiece piece = curBoard.getPiece(move.getStartPosition());
         if (move.isEnpassant()) {
             curBoard.addPiece(enpassantable.getEndPosition(), null);

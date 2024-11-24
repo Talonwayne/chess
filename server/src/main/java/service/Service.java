@@ -25,6 +25,14 @@ public class Service {
         authDAO.clear();
     }
 
+    public GameDAO getGameDAO() {
+        return gameDAO;
+    }
+
+    public AuthDAO getAuthDAO() {
+        return authDAO;
+    }
+
     public void joinGame(String authToken, String color, int gameID) throws DataAccessException, FileAlreadyExistsException {
         if (color == null || color.isEmpty()) {
             throw new DataAccessException("Color is empty");

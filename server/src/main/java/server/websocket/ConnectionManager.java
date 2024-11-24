@@ -1,7 +1,6 @@
 package server.websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.messages.LoadGameMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -38,7 +37,25 @@ public class ConnectionManager {
         }
     }
 
-    public void updateAllClientGames(LoadGameMessage update) throws IOException {
+    public void whisper(String authToken, ServerMessage notification) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : connections.values()) {
+            if (c.session.isOpen()) {
+                if (c.authToken.equals(authToken)) {
+                    c.send(notification.toString());
+                }
+            } else {
+                removeList.add(c);
+            }
+        }
+
+        // Clean up any connections that were left open.
+        for (var c : removeList) {
+            connections.remove(c.authToken);
+        }
+    }
+
+    public void updateAllClientGames(ServerMessage update) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
