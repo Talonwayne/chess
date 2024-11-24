@@ -1,10 +1,12 @@
-package ui;
+package client;
 
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import model.GameData;
+import ui.DrawBoard;
+import ui.EscapeSequences;
 import websocket.WebSocketFacade;
 
 import java.net.HttpRetryException;
@@ -19,6 +21,7 @@ public class ChessClient {
     public boolean isInGame = false;
     public boolean isObserving = false;
     private ChessGame curGame;
+    private int gameID;
     private DrawBoard display;
     private String auth;
     private ArrayList<GameData> curGameList;
@@ -190,6 +193,12 @@ public class ChessClient {
         boolean isWhite = color.equals("WHITE");
         display = new DrawBoard(isWhite);
         curGame = gameData.game() != null ? gameData.game() : new ChessGame();
+        gameID = gameData.gameID();
+        try {
+            webSocket.connectToGame(auth, gameID);
+        } catch (HttpRetryException e) {
+            throw new RuntimeException(EscapeSequences.SET_TEXT_COLOR_RED  + "Connection Error");
+        }
         isInGame = true;
         return redrawBoard();
     }
@@ -215,6 +224,8 @@ public class ChessClient {
         try {
             GameData gameData = curGameList.get(realIndex);
             curGame = gameData.game() != null ? gameData.game() : new ChessGame();
+            gameID = gameData.gameID();
+            webSocket.connectToGame(auth,gameID);
             isObserving = true;
             isInGame = true;
             return redrawBoard();
@@ -260,7 +271,11 @@ public class ChessClient {
         if (!isInGame){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
         }
-        //Websocket here plz
+        try {
+            webSocket.leaveGame(auth, gameID);
+        } catch (HttpRetryException e) {
+            throw new RuntimeException(EscapeSequences.SET_TEXT_COLOR_RED  + "Connection Error");
+        }
         isInGame = false;
         return help();
     }
@@ -288,7 +303,11 @@ public class ChessClient {
         }
 
         ChessMove move = new ChessMove(readPosition(start),readPosition(end),promo);
-        //Websocket here plz
+        try {
+            webSocket.makeMove(auth, gameID, move);
+        } catch (HttpRetryException e) {
+            throw new RuntimeException(EscapeSequences.SET_TEXT_COLOR_RED  + "Connection Error");
+        }
         return "";
     }
 
@@ -299,7 +318,11 @@ public class ChessClient {
         System.out.print("Are you Sure you want to Resign? [yes] | [no]");
         Scanner scanner = new Scanner(System.in);
         if (scanner.nextLine().equals("yes")){
-            //Websocket here plz
+            try {
+                webSocket.resignGame(auth, gameID);
+            } catch (HttpRetryException e) {
+                throw new RuntimeException(EscapeSequences.SET_TEXT_COLOR_RED  + "Connection Error");
+            }
         }
 
         return "";

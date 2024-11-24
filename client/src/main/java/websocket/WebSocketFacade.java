@@ -3,7 +3,7 @@ package websocket;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
-import websocket.commands.makeMoveCommand;
+import websocket.commands.MakeMoveCommand;
 import websocket.messages.NotificationMessage;
 
 import javax.websocket.*;
@@ -50,7 +50,7 @@ public class WebSocketFacade extends Endpoint {
 
     public void makeMove(String authToken, int gameID, ChessMove move) throws HttpRetryException {
         try {
-            var action = new makeMoveCommand(authToken, gameID, move);
+            var action = new MakeMoveCommand(authToken, gameID, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new HttpRetryException(ex.getMessage(),500);

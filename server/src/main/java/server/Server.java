@@ -7,8 +7,8 @@ import spark.*;
 import handlers.*;
 
 public class Server {
-    private Service service;
-    private WebSocketHandler webSocketHandler;
+    private final Service service;
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
         try{
@@ -21,10 +21,6 @@ public class Server {
         AuthDAO authDAO = new MySqlAuthDAO();
         service = new Service(userDAO,gameDAO,authDAO);
         webSocketHandler = new WebSocketHandler(service);
-        giveHandlersTheService();
-    }
-    public void setService(Service hservice){
-        service = hservice;
         giveHandlersTheService();
     }
 

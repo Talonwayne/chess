@@ -7,7 +7,6 @@ import model.responses.ListGamesResponse;
 import model.responses.LoginResponse;
 import org.junit.jupiter.api.*;
 import server.Server;
-import ui.ServerFacade;
 import org.junit.jupiter.api.Test;
 
 import java.net.HttpRetryException;
