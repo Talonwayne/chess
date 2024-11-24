@@ -27,7 +27,11 @@ public class ChessClient {
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         curGameList = null;
-        webSocket = new WebSocketFacade(serverUrl);
+        try {
+            webSocket = new WebSocketFacade(serverUrl);
+        } catch (Exception e){
+            System.out.print("Websocket failed to init");
+        }
     }
 
     public String evaluate(String input){

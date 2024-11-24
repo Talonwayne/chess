@@ -1,7 +1,9 @@
 package websocket;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
 import websocket.commands.UserGameCommand;
+import websocket.commands.makeMoveCommand;
 import websocket.messages.NotificationMessage;
 
 import javax.websocket.*;
@@ -37,7 +39,7 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void connectToGame(String visitorName) throws HttpRetryException {
+    public void connectToGame(String authToken, int gameID) throws HttpRetryException {
         try {
             UserGameCommand action = new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
@@ -46,29 +48,29 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
-    public void makeMove(String visitorName) throws HttpRetryException {
+    public void makeMove(String authToken, int gameID, ChessMove move) throws HttpRetryException {
         try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.MAKE_MOVE, visitorName);
+            var action = new makeMoveCommand(authToken, gameID, move);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new HttpRetryException(ex.getMessage(),500);
         }
     }
 
-    public void leaveGame(String visitorName) throws HttpRetryException {
+    public void leaveGame(String authToken, int gameID) throws HttpRetryException {
         try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, visitorName);
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException ex) {
-            throw new HttpRetryException(ex.getMessage(),500);
-        }
-    }
-
-    public void resignGame(String visitorName) throws HttpRetryException {
-        try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, visitorName);
+            var action = new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
             this.session.close();
+        } catch (IOException ex) {
+            throw new HttpRetryException(ex.getMessage(),500);
+        }
+    }
+
+    public void resignGame(String authToken, int gameID) throws HttpRetryException {
+        try {
+            var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);
+            this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new HttpRetryException(ex.getMessage(),500);
         }
