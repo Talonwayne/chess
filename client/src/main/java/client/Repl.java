@@ -1,13 +1,18 @@
 package client;
 
+import com.google.gson.Gson;
 import ui.EscapeSequences;
 import websocket.NotificationHandler;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
 public class Repl implements NotificationHandler {
     private final ChessClient client;
+    private final Gson GSON = new Gson();
 
     public Repl(String serverUrl){
         client = new ChessClient(serverUrl);
@@ -41,8 +46,23 @@ public class Repl implements NotificationHandler {
         }
     }
 
-    public void notify(NotificationMessage notification) {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + notification.getMessage());
-        printPrompt(client.isInGame,client.isInGame);
+    public void notify(String message) {
+            ServerMessage serverMessage = GSON.fromJson(message, ServerMessage.class);
+            switch (serverMessage.getServerMessageType()) {
+                case LOAD_GAME -> {
+                    LoadGameMessage loadGameMessage = GSON.fromJson(message, LoadGameMessage.class);
+                    client.setCurGame(loadGameMessage.getGame());
+                    client.redrawBoard();
+                }
+                case ERROR -> {
+                    ErrorMessage errorMessage = GSON.fromJson(message, ErrorMessage.class);
+                    System.out.print(errorMessage.getMessage());
+                    printPrompt(client.isInGame,client.isLoggedIn);
+                }
+                case NOTIFICATION -> {
+                    NotificationMessage notificationMessage = GSON.fromJson(message, NotificationMessage.class);
+                    System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW + notificationMessage.getMessage());
+                }
+            }
     }
 }

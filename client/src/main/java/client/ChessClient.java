@@ -20,7 +20,7 @@ public class ChessClient {
     public boolean isLoggedIn = false;
     public boolean isInGame = false;
     public boolean isObserving = false;
-    private ChessGame curGame;
+    public ChessGame curGame;
     private int gameID;
     private DrawBoard display;
     private String auth;
@@ -366,5 +366,9 @@ public class ChessClient {
             );
         }
         return new ChessPosition(row,col);
+    }
+
+    public void setCurGame(ChessGame curGame) {
+        this.curGame = curGame;
     }
 }
