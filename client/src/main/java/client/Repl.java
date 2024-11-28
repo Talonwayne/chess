@@ -63,6 +63,9 @@ public class Repl implements NotificationHandler {
                     NotificationMessage notificationMessage = GSON.fromJson(message, NotificationMessage.class);
                     System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW + notificationMessage.getMessage());
                 }
+                default -> {
+                    return;
+                }
             }
     }
 }
