@@ -61,19 +61,19 @@ public class WebSocketHandler {
             }
 
 
-        LoadGameMessage lgm = new LoadGameMessage(gameData.game());
-        connections.whisper(authToken, lgm);
+            LoadGameMessage lgm = new LoadGameMessage(gameData.game());
+            connections.whisper(authToken, lgm);
 
-        String message;
-        if (username.equals(gameData.whiteUsername())){
-            message = username + " has joined the game as white.";
-        } else if (username.equals(gameData.blackUsername())) {
-            message = username + " has joined the game as black.";
-        } else {
-            message = username + " is spectating this game.";
-        }
-        NotificationMessage nm = new NotificationMessage(message);
-        connections.broadcast(authToken, nm);
+            String message;
+            if (username.equals(gameData.whiteUsername())){
+                message = username + " has joined the game as white.";
+            } else if (username.equals(gameData.blackUsername())) {
+                message = username + " has joined the game as black.";
+            } else {
+                message = username + " is spectating this game.";
+            }
+            NotificationMessage nm = new NotificationMessage(message);
+            connections.broadcast(authToken, nm);
         } catch (DataAccessException e) {
             connections.whisper(authToken, new ErrorMessage("Error: Session Invalid"));
         }
@@ -89,6 +89,20 @@ public class WebSocketHandler {
                 return;
             } else if (gameData == null) {
                 connections.whisper(authToken, new ErrorMessage("Error: Connection to the Game is Invalid"));
+                return;
+            }
+
+            ChessGame.TeamColor color;
+            if(gameData.whiteUsername().equals(username)){
+                color = ChessGame.TeamColor.WHITE;
+            } else if (gameData.blackUsername().equals(username)) {
+                color = ChessGame.TeamColor.BLACK;
+            }else {
+                color = null;
+            }
+
+            if (!gameData.game().curTeam.equals(color)){
+                connections.whisper(authToken, new ErrorMessage("Error: Wow, you can't play for the other team!."));
                 return;
             }
 
@@ -166,6 +180,7 @@ public class WebSocketHandler {
             String username = service.getAuthDAO().getUsername(authToken);
             GameData gameData = service.getGameDAO().getGame(gameID);
 
+
             if (username == null) {
                 connections.whisper(authToken, new ErrorMessage("Error: Session Invalid"));
                 return;
@@ -173,6 +188,26 @@ public class WebSocketHandler {
                 connections.whisper(authToken, new ErrorMessage("Error: Connection to the Game is Invalid"));
                 return;
             }
+
+            if (gameData.game().isGameOver){
+                connections.whisper(authToken, new ErrorMessage("Error: This game is already over."));
+                return;
+            }
+
+            ChessGame.TeamColor color;
+            if(gameData.whiteUsername().equals(username)){
+                color = ChessGame.TeamColor.WHITE;
+            } else if (gameData.blackUsername().equals(username)) {
+                color = ChessGame.TeamColor.BLACK;
+            }else {
+                color = null;
+            }
+
+            if(color == null){
+                connections.whisper(authToken, new ErrorMessage("Error: Observers cannot resign the game."));
+                return;
+            }
+
 
             gameData.game().isGameOver = true;
             updateGame(authToken, gameData);

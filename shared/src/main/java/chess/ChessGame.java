@@ -13,7 +13,7 @@ import java.util.Objects;
  */
 public class ChessGame implements Cloneable{
 
-    private TeamColor curTeam;
+    public TeamColor curTeam;
     private ChessBoard curBoard;
     private boolean whiteCastleQueenside =true;
     private boolean whiteCastleKingside = true;
