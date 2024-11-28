@@ -31,7 +31,7 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, String message) throws IOException{
         UserGameCommand command = GSON.fromJson(message, UserGameCommand.class);
         switch (command.getCommandType()) {
             case CONNECT -> connect(command.getAuthToken(),command.getGameID(), session);
@@ -44,10 +44,23 @@ public class WebSocketHandler {
         }
     }
 
-    private void connect(String authToken, int gameID, Session session) throws IOException {
-        String username = getUsername(authToken);
-        GameData gameData = getGameData(authToken,gameID);
-        connections.add(authToken, session);
+    private void connect(String authToken, int gameID, Session session) throws IOException{
+        try {
+            String username = service.getAuthDAO().getUsername(authToken);
+            GameData gameData = service.getGameDAO().getGame(gameID);
+
+            connections.add(authToken, session);
+            if (username == null) {
+                connections.whisper(authToken, new ErrorMessage("Error: Connection to the user is Invalid"));
+                connections.remove(authToken);
+                return;
+            } else if (gameData == null) {
+                connections.whisper(authToken,new ErrorMessage("Error: Connection to the game is Invalid"));
+                connections.remove(authToken);
+                return;
+            }
+
+
         LoadGameMessage lgm = new LoadGameMessage(gameData.game());
         connections.whisper(authToken, lgm);
 
@@ -61,103 +74,121 @@ public class WebSocketHandler {
         }
         NotificationMessage nm = new NotificationMessage(message);
         connections.broadcast(authToken, nm);
+        } catch (DataAccessException e) {
+            connections.whisper(authToken, new ErrorMessage("Error: Session Invalid"));
+        }
     }
 
-    private void makeMove(String authToken, int gameID, ChessMove move) throws IOException {
-        String username = getUsername(authToken);
-        GameData gameData = getGameData(authToken,gameID);
+    private void makeMove(String authToken, int gameID, ChessMove move) throws IOException{
+        try {
+            String username = service.getAuthDAO().getUsername(authToken);
+            GameData gameData = service.getGameDAO().getGame(gameID);
 
-        if(gameData.game().isGameOver){
-            connections.whisper(authToken, new ErrorMessage("Error: The game is over, no new moves can be made."));
-            throw new IOException("No new moves can be made!");
-        }
+            if (username == null){
+                connections.whisper(authToken, new ErrorMessage("Error: Session Invalid"));
+                return;
+            } else if (gameData == null) {
+                connections.whisper(authToken, new ErrorMessage("Error: Connection to the Game is Invalid"));
+                return;
+            }
 
-        try{
-            gameData.game().makeMove(move);
-        } catch (InvalidMoveException e) {
-            connections.whisper(authToken, new ErrorMessage("Error: that is an Invalid Move."));
-            throw new IOException("Invalid move");
-        }
-        updateGame(authToken,gameData);
+            if(gameData.game().isGameOver){
+                connections.whisper(authToken, new ErrorMessage("Error: The game is over, no new moves can be made."));
+                return;
+            }
 
-        connections.updateAllClientGames(new LoadGameMessage(gameData.game()));
-
-        String message = username + " moved from " + move.getStartPosition() + " to " + move.getEndPosition() + ".";
-        connections.broadcast(authToken,new NotificationMessage(message));
-
-        ChessGame.TeamColor notCurPlayer = gameData.game().getTeamTurn() == ChessGame.TeamColor.BLACK ? ChessGame.TeamColor.WHITE: ChessGame.TeamColor.BLACK;
-
-        if(gameData.game().isInCheckmate(notCurPlayer)){
-            String gameOverMessage = username + " has won the game by Checkmate!";
-            connections.updateAllClientGames(new NotificationMessage(gameOverMessage));
-            gameData.game().isGameOver = true;
+            try{
+                gameData.game().makeMove(move);
+            } catch (InvalidMoveException e) {
+                connections.whisper(authToken, new ErrorMessage("Error: that is an Invalid Move."));
+                return;
+            }
             updateGame(authToken,gameData);
-        } else if (gameData.game().isInStalemate(notCurPlayer)) {
-            String gameOverMessage = "Game has ended in a stalemate!";
-            connections.updateAllClientGames(new NotificationMessage(gameOverMessage));
-            gameData.game().isGameOver = true;
-            updateGame(authToken,gameData);
-        } else if (gameData.game().isInCheck(notCurPlayer)) {
-            String checkMessage = username + " has put the enemy king in Check!";
-            connections.updateAllClientGames(new NotificationMessage(checkMessage));
-        }
 
+            connections.updateAllClientGames(new LoadGameMessage(gameData.game()));
+
+            String message = username + " moved from " + move.getStartPosition() + " to " + move.getEndPosition() + ".";
+            connections.broadcast(authToken,new NotificationMessage(message));
+
+            ChessGame.TeamColor notCurPlayer = gameData.game().getTeamTurn() == ChessGame.TeamColor.BLACK ? ChessGame.TeamColor.WHITE: ChessGame.TeamColor.BLACK;
+
+            if(gameData.game().isInCheckmate(notCurPlayer)){
+                String gameOverMessage = username + " has won the game by Checkmate!";
+                connections.updateAllClientGames(new NotificationMessage(gameOverMessage));
+                gameData.game().isGameOver = true;
+                updateGame(authToken,gameData);
+            } else if (gameData.game().isInStalemate(notCurPlayer)) {
+                String gameOverMessage = "Game has ended in a stalemate!";
+                connections.updateAllClientGames(new NotificationMessage(gameOverMessage));
+                gameData.game().isGameOver = true;
+                updateGame(authToken,gameData);
+            } else if (gameData.game().isInCheck(notCurPlayer)) {
+                String checkMessage = username + " has put the enemy king in Check!";
+                connections.updateAllClientGames(new NotificationMessage(checkMessage));
+            }
+        } catch (Exception e) {
+            connections.whisper(authToken, new ErrorMessage("Error: Websocket"));
+        }
     }
 
     private void leave(String authToken, int gameID) throws IOException {
-        String username = getUsername(authToken);
-        GameData gameData = getGameData(authToken,gameID);
-
-        String message = username + " has left the game.";
-        connections.broadcast(authToken, new NotificationMessage(message));
-
-        if (username.equals(gameData.blackUsername())){
-            gameData.setBlackUsername(null);
-            updateGame(authToken, gameData);
-        } else if (username.equals(gameData.whiteUsername())) {
-            gameData.setWhiteUsername(null);
-            updateGame(authToken, gameData);
-        }
-
-        connections.remove(authToken);
-    }
-
-    private void resign(String authToken, int gameID) throws IOException {
-        String username = getUsername(authToken);
-        GameData gameData = getGameData(authToken,gameID);
-
-        gameData.game().isGameOver = true;
-        updateGame(authToken, gameData);
-
-        NotificationMessage nm = new NotificationMessage(username + " has resigned the game!");
-        connections.updateAllClientGames(nm);
-    }
-
-    private String getUsername(String authToken) throws IOException{
         try {
-            return service.getAuthDAO().getUsername(authToken);
-        } catch (DataAccessException e) {
-            //Tell the root client that its bad
-            connections.whisper(authToken, new ErrorMessage("Error: Session Invalid"));
-            throw new IOException("Failed Get Username");
-        }
+            String username = service.getAuthDAO().getUsername(authToken);
+            GameData gameData = service.getGameDAO().getGame(gameID);
+
+            if (username == null) {
+                connections.whisper(authToken, new ErrorMessage("Error: Session Invalid"));
+                return;
+            } else if (gameData == null) {
+                connections.whisper(authToken, new ErrorMessage("Error: Connection to the Game is Invalid"));
+                return;
+            }
+
+            String message = username + " has left the game.";
+            connections.broadcast(authToken, new NotificationMessage(message));
+
+            if (username.equals(gameData.blackUsername())) {
+                gameData.setBlackUsername(null);
+                updateGame(authToken, gameData);
+            } else if (username.equals(gameData.whiteUsername())) {
+                gameData.setWhiteUsername(null);
+                updateGame(authToken, gameData);
+            }
+
+            connections.remove(authToken);
+            } catch (Exception e) {
+                connections.whisper(authToken, new ErrorMessage("Error: Websocket"));
+            }
     }
 
-    private GameData getGameData(String authToken, int gameID) throws IOException{
-        try{
-            return service.getGameDAO().getGame(gameID);
-        } catch (DataAccessException e) {
-            connections.whisper(authToken, new ErrorMessage("Error: Connection to the Game is Invalid"));
-            throw new IOException("Failed Get Game");
+    private void resign(String authToken, int gameID) throws IOException{
+        try {
+            String username = service.getAuthDAO().getUsername(authToken);
+            GameData gameData = service.getGameDAO().getGame(gameID);
+
+            if (username == null) {
+                connections.whisper(authToken, new ErrorMessage("Error: Session Invalid"));
+                return;
+            } else if (gameData == null) {
+                connections.whisper(authToken, new ErrorMessage("Error: Connection to the Game is Invalid"));
+                return;
+            }
+
+            gameData.game().isGameOver = true;
+            updateGame(authToken, gameData);
+
+            NotificationMessage nm = new NotificationMessage(username + " has resigned the game!");
+            connections.updateAllClientGames(nm);
+        } catch (Exception e) {
+            connections.whisper(authToken, new ErrorMessage("Error: Websocket"));
         }
     }
 
     private void updateGame(String authToken,GameData updatedData) throws IOException{
         try{
         service.getGameDAO().updateGame(updatedData.gameID(), updatedData);
-        } catch (DataAccessException e) {
+        } catch (DataAccessException| NullPointerException e) {
             connections.whisper(authToken, new ErrorMessage("Error: Connection to the Game is Invalid"));
-            throw new IOException("Failed Get Game");
         }
     }
 }

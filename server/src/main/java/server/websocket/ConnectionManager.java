@@ -2,6 +2,7 @@ package server.websocket;
 
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ErrorMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -22,52 +23,51 @@ public class ConnectionManager {
     }
 
     public void broadcast(String excludeAuth, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
+        ArrayList<Connection> removeList = cleanUpInactiveConnections();
+
         for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (!c.authToken.equals(excludeAuth)) {
-                    c.send(GSON.toJson(notification));
-                }
-            } else {
-                removeList.add(c);
+            if (c.session.isOpen() && !c.authToken.equals(excludeAuth)) {
+                c.send(GSON.toJson(notification));
             }
         }
 
-        // Clean up any connections that were left open.
-        for (var c : removeList) {
-            connections.remove(c.authToken);
-        }
+        // Clean up any connections that were left open
+        cleanUpConnections(removeList);
     }
 
     public void whisper(String authToken, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
+        ArrayList<Connection> removeList = cleanUpInactiveConnections();
+
         for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (c.authToken.equals(authToken)) {
-                    c.send(GSON.toJson(notification));
-                }
-            } else {
-                removeList.add(c);
+            if (c.session.isOpen() && c.authToken.equals(authToken)) {
+                c.send(GSON.toJson(notification));
             }
         }
-
-        // Clean up any connections that were left open.
-        for (var c : removeList) {
-            connections.remove(c.authToken);
-        }
+        cleanUpConnections(removeList);
     }
 
     public void updateAllClientGames(ServerMessage update) throws IOException {
-        var removeList = new ArrayList<Connection>();
+        ArrayList<Connection> removeList = cleanUpInactiveConnections();
+
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 c.send(GSON.toJson(update));
-            } else {
+            }
+        }
+        cleanUpConnections(removeList);
+    }
+
+    private ArrayList<Connection> cleanUpInactiveConnections() {
+        ArrayList<Connection> removeList = new ArrayList<>();
+        for (var c : connections.values()) {
+            if (!c.session.isOpen()) {
                 removeList.add(c);
             }
         }
+        return removeList;
+    }
 
-        // Clean up any connections that were left open.
+    private void cleanUpConnections(ArrayList<Connection> removeList) {
         for (var c : removeList) {
             connections.remove(c.authToken);
         }
