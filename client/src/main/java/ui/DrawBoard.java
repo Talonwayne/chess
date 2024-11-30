@@ -24,8 +24,6 @@ public class DrawBoard {
         isWhite = isViewColorWhite;
     }
 
-    public void setGame(ChessGame game){this.game = game;}
-
     public void drawBoard(ChessGame game) {
         this.game = game;
         String[] symbols = isWhite ? new String[]{"a", "b", "c", "d", "e", "f", "g", "h"} : new String[]{"h", "g", "f", "e", "d", "c", "b", "a"};
@@ -67,7 +65,8 @@ public class DrawBoard {
     }
 
     private void drawSquare(ChessPosition square, ChessPiece piece) {
-        String squareColor = (square.getRow() + square.getColumn()) % 2 == 0 ? EscapeSequences.SET_BG_COLOR_DARK_GREY : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+        String squareColor = (square.getRow() + square.getColumn()) % 2 == 0
+                ? EscapeSequences.SET_BG_COLOR_DARK_GREY : EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
         if (isHighlight){
             if(highlights.contains(square)){
                 System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW);

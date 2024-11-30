@@ -10,24 +10,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 
 public class ConnectionManager {
-    // Map to store all active connections by authToken
     private final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
-    // Map to track which session is associated with which gameID
     private final ConcurrentHashMap<Integer, List<Connection>> gameConnections = new ConcurrentHashMap<>();
-    private final Gson GSON = new Gson();
+    private static final Gson GSON = new Gson();
 
-    // Add a connection to a game
     public void add(String authToken, Session session, int gameID) {
         var connection = new Connection(authToken, session);
         connections.put(authToken, connection);
-
-        // Track the connection by gameID
         gameConnections.computeIfAbsent(gameID, k -> new ArrayList<>()).add(connection);
     }
 
-    // Remove a connection from the game
     public void remove(String authToken, int gameID) {
-        // Remove from both game-specific and global maps
         Connection connection = connections.remove(authToken);
         if (connection != null) {
             List<Connection> gameSessionList = gameConnections.get(gameID);
@@ -40,11 +33,9 @@ public class ConnectionManager {
         }
     }
 
-    // Broadcast a notification to all players in the same game, excluding one
     public void broadcast(String excludeAuth, ServerMessage notification,int gameID) throws IOException {
         ArrayList<Connection> removeList = cleanUpInactiveConnections();
 
-        // Get all connections for the game
         List<Connection> gameSessionList = gameConnections.get(gameID);
         if (gameSessionList != null) {
             for (var c : gameSessionList) {
@@ -56,25 +47,20 @@ public class ConnectionManager {
         cleanUpConnections(removeList);
     }
 
-    // Send a whisper (private message) to a specific user in a game
     public void whisper(String authToken, ServerMessage notification, int gameID) throws IOException {
         ArrayList<Connection> removeList = cleanUpInactiveConnections();
 
-        // Find the connection by authToken and send the message if session is open
         for (var c : gameConnections.getOrDefault(gameID, new ArrayList<>())) {
             if (c.session.isOpen() && c.authToken.equals(authToken)) {
                 c.send(GSON.toJson(notification));
             }
         }
-
         cleanUpConnections(removeList);
     }
 
-    // Update all clients in the game (e.g., after a move, game update)
-    public void updateAllClientGames(ServerMessage update,int gameID) throws IOException {
+   public void updateAllClientGames(ServerMessage update,int gameID) throws IOException {
         ArrayList<Connection> removeList = cleanUpInactiveConnections();
 
-        // Get all connections for the game
         List<Connection> gameSessionList = gameConnections.get(gameID);
         if (gameSessionList != null) {
             for (var c : gameSessionList) {
@@ -83,11 +69,9 @@ public class ConnectionManager {
                 }
             }
         }
-
         cleanUpConnections(removeList);
     }
 
-    // Clean up inactive connections
     private ArrayList<Connection> cleanUpInactiveConnections() {
         ArrayList<Connection> removeList = new ArrayList<>();
         for (var c : connections.values()) {
@@ -98,11 +82,9 @@ public class ConnectionManager {
         return removeList;
     }
 
-    // Remove inactive connections from the game and global maps
     private void cleanUpConnections(ArrayList<Connection> removeList) {
         for (var c : removeList) {
-            connections.remove(c.authToken);  // Remove from global map
-            // Also remove from any associated game-specific list
+            connections.remove(c.authToken);
             for (var gameSessionList : gameConnections.values()) {
                 gameSessionList.remove(c);
             }

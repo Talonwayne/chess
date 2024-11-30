@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Repl implements NotificationHandler {
     private final ChessClient client;
-    private final Gson GSON = new Gson();
+    private static final Gson GSON = new Gson();
 
     public Repl(String serverUrl){
         client = new ChessClient(serverUrl);

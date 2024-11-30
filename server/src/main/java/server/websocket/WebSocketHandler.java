@@ -98,7 +98,8 @@ public class WebSocketHandler {
         connections.broadcast(authToken, nm,gameID);
     }
 
-    private void makeMove(String authToken, int gameID, ChessMove move, GameData gameData,String username ,ChessGame.TeamColor color) throws IOException{
+    private void makeMove(String authToken, int gameID, ChessMove move,
+                          GameData gameData,String username ,ChessGame.TeamColor color) throws IOException{
 
         if (!gameData.game().curTeam.equals(color)){
             connections.whisper(authToken, new ErrorMessage("Error: Wow, you can't play for the other team!."),gameID);
@@ -123,7 +124,8 @@ public class WebSocketHandler {
         String message = username + " moved from " + move.getStartPosition() + " to " + move.getEndPosition() + ".";
         connections.broadcast(authToken,new NotificationMessage(message),gameID);
 
-        ChessGame.TeamColor notCurPlayer = gameData.game().getTeamTurn() == ChessGame.TeamColor.BLACK ? ChessGame.TeamColor.WHITE: ChessGame.TeamColor.BLACK;
+        ChessGame.TeamColor notCurPlayer = gameData.game().getTeamTurn() == ChessGame.TeamColor.BLACK
+                ? ChessGame.TeamColor.WHITE: ChessGame.TeamColor.BLACK;
 
         if(gameData.game().isInCheckmate(notCurPlayer)){
             String gameOverMessage = username + " has won the game by Checkmate!";

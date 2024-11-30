@@ -285,7 +285,8 @@ public class ChessClient {
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
         }
         if (params.length < 2) {
-            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: StartPosition[a4] EndPosition[a5] PromotionType[ |QUEEN|BISHOP|KNIGHT|ROOK]");
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "Expected: StartPosition[a4] EndPosition[a5] PromotionType[ |QUEEN|BISHOP|KNIGHT|ROOK]");
         }
 
         String start = params[0];
@@ -298,7 +299,8 @@ public class ChessClient {
                 case "ROOK" -> promo = ChessPiece.PieceType.ROOK;
                 case "BISHOP" -> promo = ChessPiece.PieceType.BISHOP;
                 case "KNIGHT" -> promo = ChessPiece.PieceType.KNIGHT;
-                default -> throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "Expected: StartPosition[a4] EndPosition[a5] PromotionType[ |QUEEN|BISHOP|KNIGHT|ROOK]");
+                default -> throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED +
+                        "Expected: StartPosition[a4] EndPosition[a5] PromotionType[ |QUEEN|BISHOP|KNIGHT|ROOK]");
             }
         }
 
