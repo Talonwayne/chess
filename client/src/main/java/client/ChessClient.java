@@ -95,17 +95,17 @@ public class ChessClient {
 
     public String help(){
         if(isInGame){
-            return """
+            return EscapeSequences.SET_TEXT_COLOR_GREEN + """
                     Valid Inputs
                     1 [position of the piece] - Highlight the possible moves of a piece (write the letter first like a4)
-                    2 [start position] [end position] [ |QUEEN|BISHOP|KNIGHT|ROOK]"- Make a move (write the letter first like a4)
+                    2 [start position] [end position] [   |QUEEN|BISHOP|KNIGHT|ROOK]"- Make a move (write the letter first like a4)
                     3 - Redraw the Chessboard
                     4 - Leave the game
                     5 - Resign the game
                     help - see possible commands
                     """;
         } else if (isLoggedIn){
-            return """
+            return EscapeSequences.SET_TEXT_COLOR_GREEN + """
                     Valid Inputs
                     create <NAME> - make a game
                     list - show all games
@@ -116,7 +116,7 @@ public class ChessClient {
                     help - see possible commands
                     """;
         } else {
-            return """
+            return EscapeSequences.SET_TEXT_COLOR_GREEN + """ 
                     Valid Inputs
                     register <USERNAME> <PASSWORD> <EMAIL> - to make an account
                     login <USERNAME> <PASSWORD> - to play
@@ -200,7 +200,7 @@ public class ChessClient {
             throw new RuntimeException(EscapeSequences.SET_TEXT_COLOR_RED  + "Connection Error");
         }
         isInGame = true;
-        return redrawBoard();
+        return redrawBoard() + help();
     }
 
     public String observe(String... params){
@@ -308,6 +308,7 @@ public class ChessClient {
         } catch (HttpRetryException e) {
             throw new RuntimeException(EscapeSequences.SET_TEXT_COLOR_RED  + "Connection Error");
         }
+        redrawBoard();
         return "";
     }
 
