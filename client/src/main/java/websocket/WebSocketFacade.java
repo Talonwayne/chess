@@ -15,10 +15,11 @@ public class WebSocketFacade extends Endpoint {
     Session session;
     NotificationHandler notificationHandler;
 
-    public WebSocketFacade(String url) throws HttpRetryException{
+    public WebSocketFacade(String url, NotificationHandler notificationHandler) throws HttpRetryException{
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
+            this.notificationHandler = notificationHandler;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);

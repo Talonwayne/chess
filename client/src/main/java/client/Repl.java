@@ -14,7 +14,7 @@ public class Repl implements NotificationHandler {
     private static final Gson GSON = new Gson();
 
     public Repl(String serverUrl){
-        client = new ChessClient(serverUrl);
+        client = new ChessClient(serverUrl, this);
     }
 
     public void run(){
@@ -22,8 +22,11 @@ public class Repl implements NotificationHandler {
         Scanner scanner = new Scanner(System.in);
         var result = "";
         System.out.print(client.evaluate(""));
+        printPrompt(client.isInGame, client.isLoggedIn);
         while (!result.equals(EscapeSequences.SET_TEXT_COLOR_YELLOW + "Thanks for Playing")){
-            printPrompt(client.isInGame, client.isLoggedIn);
+            if (result != "") {
+                printPrompt(client.isInGame, client.isLoggedIn);
+            }
             String input = scanner.nextLine();
             try{
                 result = client.evaluate(input);
@@ -46,22 +49,22 @@ public class Repl implements NotificationHandler {
     }
 
     public void notify(String message) {
-            ServerMessage serverMessage = GSON.fromJson(message, ServerMessage.class);
-            switch (serverMessage.getServerMessageType()) {
-                case LOAD_GAME -> {
-                    LoadGameMessage loadGameMessage = GSON.fromJson(message, LoadGameMessage.class);
-                    client.setCurGame(loadGameMessage.getGame());
-                    client.redrawBoard();
-                }
-                case ERROR -> {
-                    ErrorMessage errorMessage = GSON.fromJson(message, ErrorMessage.class);
-                    System.out.print(errorMessage.getMessage());
-                    printPrompt(client.isInGame,client.isLoggedIn);
-                }
-                case NOTIFICATION -> {
-                    NotificationMessage notificationMessage = GSON.fromJson(message, NotificationMessage.class);
-                    System.out.print(EscapeSequences.SET_BG_COLOR_YELLOW + notificationMessage.getMessage());
-                }
+        ServerMessage serverMessage = GSON.fromJson(message, ServerMessage.class);
+        switch (serverMessage.getServerMessageType()) {
+            case LOAD_GAME -> {
+                LoadGameMessage loadGameMessage = GSON.fromJson(message, LoadGameMessage.class);
+                client.setCurGame(loadGameMessage.getGame());
+                client.redrawBoard();
             }
+            case ERROR -> {
+                ErrorMessage errorMessage = GSON.fromJson(message, ErrorMessage.class);
+                System.out.print(errorMessage.getMessage());
+                printPrompt(client.isInGame,client.isLoggedIn);
+            }
+            case NOTIFICATION -> {
+                NotificationMessage notificationMessage = GSON.fromJson(message, NotificationMessage.class);
+                System.out.println(EscapeSequences.SET_TEXT_COLOR_YELLOW + notificationMessage.getMessage());
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ import chess.ChessPosition;
 import model.GameData;
 import ui.DrawBoard;
 import ui.EscapeSequences;
+import websocket.NotificationHandler;
 import websocket.WebSocketFacade;
 
 import java.net.HttpRetryException;
@@ -27,11 +28,11 @@ public class ChessClient {
     private ArrayList<GameData> curGameList;
     private WebSocketFacade webSocket;
 
-    public ChessClient(String serverUrl){
+    public ChessClient(String serverUrl, NotificationHandler repl){
         server = new ServerFacade(serverUrl);
         curGameList = null;
         try {
-            webSocket = new WebSocketFacade(serverUrl);
+            webSocket = new WebSocketFacade(serverUrl, repl);
         } catch (Exception e){
             System.out.print("Websocket failed to init");
         }
@@ -200,7 +201,7 @@ public class ChessClient {
             throw new RuntimeException(EscapeSequences.SET_TEXT_COLOR_RED  + "Connection Error");
         }
         isInGame = true;
-        return redrawBoard() + help();
+        return "";
     }
 
     public String observe(String... params){
@@ -226,9 +227,10 @@ public class ChessClient {
             curGame = gameData.game() != null ? gameData.game() : new ChessGame();
             gameID = gameData.gameID();
             webSocket.connectToGame(auth,gameID);
+            display = new DrawBoard(false);
             isObserving = true;
             isInGame = true;
-            return redrawBoard();
+            return "";
         } catch (Exception e){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "That game does not exist");
         }
@@ -258,7 +260,6 @@ public class ChessClient {
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
         }
         if (isObserving){
-            display.drawBoard(curGame);
             display.setWhite(true);
             display.drawBoard(curGame);
         } else {
@@ -317,6 +318,10 @@ public class ChessClient {
     public String resign(){
         if (!isInGame){
             throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED + "You got to join a game first");
+        }
+        if(isObserving){
+            throw new IllegalArgumentException(EscapeSequences.SET_TEXT_COLOR_RED +
+                    "You can't resign a game that you are observing");
         }
         System.out.print("Are you Sure you want to Resign? [yes] | [no]");
         Scanner scanner = new Scanner(System.in);
